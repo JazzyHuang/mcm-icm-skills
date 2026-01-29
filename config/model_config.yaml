@@ -1,0 +1,133 @@
+# Model Configuration for MCM/ICM Automation
+# Defines model selection rules and parameters
+
+# 模型选择决策树
+model_selection:
+  # 预测类问题
+  prediction:
+    time_series:
+      short_term:  # < 30 data points
+        primary: "ARIMA"
+        fallback: "ExponentialSmoothing"
+      medium_term:  # 30-100 data points
+        primary: "Prophet"
+        fallback: "SARIMA"
+      long_term:  # > 100 data points
+        primary: "LSTM"
+        fallback: "Transformer"
+    regression:
+      linear: "LinearRegression"
+      nonlinear: "RandomForest"
+      complex: "GradientBoosting"
+    
+  # 优化类问题
+  optimization:
+    linear:
+      small_scale:  # < 1000 variables
+        primary: "scipy.linprog"
+        fallback: "pulp"
+      large_scale:  # >= 1000 variables
+        primary: "gurobi"
+        fallback: "cvxpy"
+    integer:
+      primary: "pulp"
+      commercial: "gurobi"
+    nonlinear:
+      convex: "cvxpy"
+      nonconvex: "scipy.minimize"
+    multi_objective:
+      primary: "NSGA-II"
+      fallback: "weighted_sum"
+      
+  # 评价类问题
+  evaluation:
+    single_criterion:
+      primary: "TOPSIS"
+      fallback: "SAW"
+    multi_criteria:
+      primary: "AHP"
+      fallback: "ELECTRE"
+    data_driven:
+      primary: "PCA"
+      fallback: "DEA"
+      
+  # 分类类问题
+  classification:
+    binary:
+      primary: "LogisticRegression"
+      complex: "XGBoost"
+    multi_class:
+      primary: "RandomForest"
+      complex: "NeuralNetwork"
+    clustering:
+      primary: "KMeans"
+      hierarchical: "AgglomerativeClustering"
+      
+  # 网络类问题
+  network:
+    shortest_path: "Dijkstra"
+    max_flow: "FordFulkerson"
+    community_detection: "Louvain"
+    centrality: "PageRank"
+
+# 混合模型设计模式
+hybrid_patterns:
+  serial:
+    description: "物理模型 → 数据模型修正"
+    use_when: "有物理先验知识但需要数据修正"
+    
+  parallel:
+    description: "物理+数据独立预测后融合"
+    use_when: "两种方法各有优势"
+    fusion_methods: ["加权平均", "投票", "堆叠"]
+    
+  embedded:
+    description: "数据模型学习物理模型残差"
+    use_when: "物理模型有系统偏差"
+    
+  constrained:
+    description: "物理定律作为神经网络约束"
+    use_when: "需要保证物理一致性"
+
+# 敏感性分析配置
+sensitivity_analysis:
+  methods:
+    local:
+      name: "OAT (One-At-a-Time)"
+      samples: 100
+      perturbation: 0.1  # ±10%
+    global:
+      name: "Sobol"
+      samples: 2048
+      calc_second_order: true
+    screening:
+      name: "Morris"
+      trajectories: 20
+      levels: 4
+      
+# 交叉验证配置
+cross_validation:
+  default_folds: 5
+  stratified: true
+  time_series:
+    method: "TimeSeriesSplit"
+    n_splits: 5
+
+# 默认超参数
+default_hyperparameters:
+  random_forest:
+    n_estimators: 100
+    max_depth: null
+    min_samples_split: 2
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+  lstm:
+    units: 64
+    dropout: 0.2
+    epochs: 100
+    batch_size: 32
+  prophet:
+    changepoint_prior_scale: 0.05
+    seasonality_mode: "multiplicative"

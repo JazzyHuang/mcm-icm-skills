@@ -1,0 +1,360 @@
+{
+  "strategies": {
+    "A": {
+      "name": "连续问题",
+      "name_en": "Continuous",
+      "description": "涉及连续数学、物理建模的问题",
+      "typical_topics": [
+        "传热传质",
+        "流体力学",
+        "结构力学",
+        "电磁场",
+        "人口动力学"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "识别物理过程",
+          "确定控制方程类型",
+          "理解边界条件"
+        ],
+        "phase2_modeling": [
+          "建立微分方程模型",
+          "确定初边值条件",
+          "选择合适的数值方法"
+        ],
+        "phase3_solving": [
+          "使用ODE/PDE求解器",
+          "有限差分或有限元",
+          "验证数值稳定性"
+        ],
+        "phase4_analysis": [
+          "参数敏感性分析",
+          "稳态分析",
+          "动态行为分析"
+        ]
+      },
+      "key_methods": [
+        "常微分方程 (ODE)",
+        "偏微分方程 (PDE)",
+        "有限元方法 (FEM)",
+        "有限差分方法 (FDM)",
+        "边界元方法"
+      ],
+      "python_tools": [
+        "scipy.integrate",
+        "scipy.linalg",
+        "FEniCS",
+        "numpy"
+      ],
+      "common_pitfalls": [
+        "边界条件设置不当",
+        "数值不稳定",
+        "网格太粗",
+        "忽略非线性效应"
+      ],
+      "innovation_directions": [
+        "多尺度方法",
+        "自适应网格",
+        "物理信息神经网络",
+        "降阶模型"
+      ]
+    },
+    "B": {
+      "name": "离散问题",
+      "name_en": "Discrete",
+      "description": "涉及离散数学、算法设计的问题",
+      "typical_topics": [
+        "调度问题",
+        "路径规划",
+        "资源分配",
+        "组合优化",
+        "游戏策略"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "识别决策变量",
+          "理解约束结构",
+          "分析问题规模"
+        ],
+        "phase2_modeling": [
+          "建立图/网络模型",
+          "定义状态空间",
+          "设计递归关系"
+        ],
+        "phase3_solving": [
+          "选择合适算法",
+          "考虑近似/启发式",
+          "分析复杂度"
+        ],
+        "phase4_analysis": [
+          "最优性分析",
+          "算法效率评估",
+          "规模扩展性"
+        ]
+      },
+      "key_methods": [
+        "图论算法",
+        "动态规划",
+        "整数规划",
+        "启发式算法",
+        "元胞自动机"
+      ],
+      "python_tools": [
+        "networkx",
+        "pulp",
+        "ortools",
+        "numpy"
+      ],
+      "common_pitfalls": [
+        "复杂度爆炸",
+        "NP难问题误判为易解",
+        "忽略整数约束",
+        "局部最优陷阱"
+      ],
+      "innovation_directions": [
+        "混合元启发式",
+        "并行化",
+        "强化学习",
+        "近似保证算法"
+      ]
+    },
+    "C": {
+      "name": "数据问题",
+      "name_en": "Data Insights",
+      "description": "涉及数据分析、机器学习的问题",
+      "typical_topics": [
+        "趋势预测",
+        "分类识别",
+        "聚类分析",
+        "异常检测",
+        "因果推断"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "理解数据结构",
+          "识别预测目标",
+          "确定特征来源"
+        ],
+        "phase2_modeling": [
+          "数据预处理",
+          "特征工程",
+          "模型选择"
+        ],
+        "phase3_solving": [
+          "交叉验证",
+          "超参数调优",
+          "模型集成"
+        ],
+        "phase4_analysis": [
+          "特征重要性",
+          "预测不确定性",
+          "模型解释性"
+        ]
+      },
+      "key_methods": [
+        "回归分析",
+        "时间序列",
+        "机器学习",
+        "深度学习",
+        "集成学习"
+      ],
+      "python_tools": [
+        "pandas",
+        "sklearn",
+        "statsmodels",
+        "prophet",
+        "xgboost"
+      ],
+      "common_pitfalls": [
+        "过拟合",
+        "数据泄露",
+        "特征工程不足",
+        "忽略数据质量"
+      ],
+      "innovation_directions": [
+        "可解释AI",
+        "迁移学习",
+        "不确定性量化",
+        "因果推断"
+      ]
+    },
+    "D": {
+      "name": "运筹学/网络科学",
+      "name_en": "Operations Research",
+      "description": "涉及运筹优化、网络设计的问题",
+      "typical_topics": [
+        "供应链优化",
+        "物流网络",
+        "设施选址",
+        "车辆路径",
+        "资源调度"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "识别决策层次",
+          "理解网络结构",
+          "确定优化目标"
+        ],
+        "phase2_modeling": [
+          "建立网络流模型",
+          "定义决策变量",
+          "设置约束条件"
+        ],
+        "phase3_solving": [
+          "使用专业求解器",
+          "考虑分解方法",
+          "设计启发式"
+        ],
+        "phase4_analysis": [
+          "最优性Gap",
+          "鲁棒性分析",
+          "规模扩展性"
+        ]
+      },
+      "key_methods": [
+        "线性规划",
+        "整数规划",
+        "网络流",
+        "排队论",
+        "仿真优化"
+      ],
+      "python_tools": [
+        "pulp",
+        "gurobi",
+        "ortools",
+        "networkx",
+        "simpy"
+      ],
+      "common_pitfalls": [
+        "模型规模过大",
+        "约束遗漏",
+        "目标函数设计不当",
+        "忽略随机性"
+      ],
+      "innovation_directions": [
+        "随机规划",
+        "鲁棒优化",
+        "在线算法",
+        "数据驱动优化"
+      ]
+    },
+    "E": {
+      "name": "可持续性",
+      "name_en": "Sustainability",
+      "description": "涉及环境可持续发展的问题",
+      "typical_topics": [
+        "气候变化",
+        "能源转型",
+        "生态保护",
+        "资源管理",
+        "碳中和"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "识别利益相关者",
+          "理解系统边界",
+          "确定时间尺度"
+        ],
+        "phase2_modeling": [
+          "建立系统动力学模型",
+          "多目标优化框架",
+          "情景分析设计"
+        ],
+        "phase3_solving": [
+          "模拟多种情景",
+          "Pareto前沿分析",
+          "敏感性研究"
+        ],
+        "phase4_analysis": [
+          "政策建议",
+          "不确定性分析",
+          "长期影响评估"
+        ]
+      },
+      "key_methods": [
+        "系统动力学",
+        "多目标优化",
+        "生命周期评估",
+        "情景分析",
+        "因果回路"
+      ],
+      "python_tools": [
+        "pysd",
+        "pymoo",
+        "scipy",
+        "SALib"
+      ],
+      "common_pitfalls": [
+        "目标冲突处理不当",
+        "时间尺度混淆",
+        "忽略社会因素",
+        "过于简化系统"
+      ],
+      "innovation_directions": [
+        "综合评估模型",
+        "不确定性传播",
+        "行为建模",
+        "多尺度集成"
+      ]
+    },
+    "F": {
+      "name": "政策",
+      "name_en": "Policy",
+      "description": "涉及政策分析、社会科学的问题",
+      "typical_topics": [
+        "公共卫生",
+        "教育政策",
+        "社会公平",
+        "信息传播",
+        "城市规划"
+      ],
+      "recommended_approach": {
+        "phase1_understanding": [
+          "识别政策目标",
+          "理解利益冲突",
+          "确定评估标准"
+        ],
+        "phase2_modeling": [
+          "建立行为模型",
+          "设计仿真框架",
+          "定义评估指标"
+        ],
+        "phase3_solving": [
+          "情景模拟",
+          "博弈分析",
+          "敏感性研究"
+        ],
+        "phase4_analysis": [
+          "政策效果评估",
+          "公平性分析",
+          "实施建议"
+        ]
+      },
+      "key_methods": [
+        "博弈论",
+        "多主体仿真",
+        "社会网络分析",
+        "决策树",
+        "因果推断"
+      ],
+      "python_tools": [
+        "mesa",
+        "networkx",
+        "scipy",
+        "pandas"
+      ],
+      "common_pitfalls": [
+        "假设过多",
+        "定性因素量化困难",
+        "忽略实施障碍",
+        "过于理想化"
+      ],
+      "innovation_directions": [
+        "行为经济学",
+        "网络效应",
+        "自然实验",
+        "机制设计"
+      ]
+    }
+  }
+}

@@ -1,0 +1,239 @@
+% MCM/ICM LaTeX Template
+% Based on mcmthesis class
+% Adapted for MCM/ICM Automation System
+
+\documentclass[12pt]{article}
+
+% === 基本设置 ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{listings}
+\usepackage{natbib}
+
+% === 页面设置 ===
+\geometry{
+    a4paper,
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% === 页眉页脚 ===
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Team \#XXXXX}
+\rhead{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% === 控制号设置 ===
+\newcommand{\controlnumber}{XXXXX}
+\newcommand{\problemtype}{A}
+
+% === 标题页 ===
+\title{\Large\textbf{Problem \problemtype: [Your Title Here]}}
+\author{Team \#\controlnumber}
+\date{February 2026}
+
+% === 摘要环境 ===
+\newenvironment{summary}{
+    \begin{center}
+    \textbf{\large Summary}
+    \end{center}
+    \begin{quotation}
+}{
+    \end{quotation}
+    \vspace{1em}
+}
+
+% === 代码样式 ===
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    language=Python,
+    numbers=left,
+    numberstyle=\tiny
+}
+
+\begin{document}
+
+% === 摘要页 ===
+\begin{titlepage}
+\begin{center}
+\vspace*{2cm}
+
+{\Large\textbf{MCM/ICM}}\\[0.5cm]
+{\large Summary Sheet}\\[2cm]
+
+{\Large Team Control Number: \controlnumber}\\[1cm]
+{\large Problem Chosen: \problemtype}\\[2cm]
+
+\begin{summary}
+% === 在此处填写摘要 ===
+[Your abstract goes here. This should be 300-500 words summarizing your approach 
+and key findings. Include: background context, problem statement, methodology overview, 
+key innovations, main results, and conclusions.]
+
+\vspace{1em}
+\textbf{Keywords:} keyword1; keyword2; keyword3; keyword4; keyword5
+\end{summary}
+
+\end{center}
+\end{titlepage}
+
+% === 目录（可选） ===
+% \tableofcontents
+% \newpage
+
+% === 正文开始 ===
+\section{Introduction}
+
+\subsection{Problem Background}
+% 问题背景描述
+
+\subsection{Problem Restatement}
+% 问题重述
+
+\subsection{Our Approach}
+% 方法概述
+
+\section{Assumptions and Justifications}
+
+\begin{itemize}
+    \item \textbf{Assumption 1:} [Description]
+    
+    \textit{Justification:} [Why this assumption is reasonable]
+    
+    \item \textbf{Assumption 2:} [Description]
+    
+    \textit{Justification:} [Why this assumption is reasonable]
+\end{itemize}
+
+\section{Notations and Definitions}
+
+\begin{table}[H]
+\centering
+\caption{Notation Summary}
+\begin{tabular}{@{}cll@{}}
+\toprule
+\textbf{Symbol} & \textbf{Description} & \textbf{Unit} \\
+\midrule
+$x$ & Decision variable & - \\
+$\alpha$ & Parameter & - \\
+$N$ & Total count & units \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Model Development}
+
+\subsection{Model Overview}
+% 模型概述
+
+\subsection{Mathematical Formulation}
+% 数学公式
+
+The objective function is:
+\begin{equation}
+    \min_{x} f(x) = \sum_{i=1}^{n} c_i x_i
+\end{equation}
+
+Subject to:
+\begin{align}
+    \sum_{j=1}^{m} a_{ij} x_j &\leq b_i, \quad \forall i \\
+    x_j &\geq 0, \quad \forall j
+\end{align}
+
+\subsection{Solution Approach}
+% 求解方法
+
+\section{Results and Analysis}
+
+\subsection{Main Results}
+% 主要结果
+
+\begin{figure}[H]
+\centering
+% \includegraphics[width=0.8\textwidth]{figure1.pdf}
+\caption{Main Results Visualization}
+\label{fig:results}
+\end{figure}
+
+\subsection{Analysis}
+% 结果分析
+
+\section{Sensitivity Analysis}
+
+\subsection{Parameter Sensitivity}
+% 参数敏感性
+
+\begin{table}[H]
+\centering
+\caption{Sensitivity Analysis Results}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Parameter} & \textbf{S1 (First-order)} & \textbf{ST (Total)} \\
+\midrule
+$\alpha$ & 0.45 & 0.52 \\
+$\beta$ & 0.30 & 0.35 \\
+$\gamma$ & 0.15 & 0.22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Robustness}
+% 鲁棒性分析
+
+\section{Model Evaluation}
+
+\subsection{Strengths}
+\begin{itemize}
+    \item \textbf{Strength 1:} [Description with evidence]
+    \item \textbf{Strength 2:} [Description with evidence]
+\end{itemize}
+
+\subsection{Weaknesses}
+\begin{itemize}
+    \item \textbf{Weakness 1:} [Description] $\rightarrow$ [Mitigation]
+    \item \textbf{Weakness 2:} [Description] $\rightarrow$ [Mitigation]
+\end{itemize}
+
+\subsection{Future Work}
+% 未来工作
+
+\section{Conclusions}
+% 结论
+
+% === 参考文献 ===
+\bibliographystyle{plain}
+% \bibliography{references}
+
+\begin{thebibliography}{99}
+\bibitem{ref1} Author, A. (2024). Title of Paper. \textit{Journal Name}, 10(1), 1-15.
+\bibitem{ref2} Author, B., \& Author, C. (2023). Another Paper. \textit{Conference Name}.
+\end{thebibliography}
+
+% === 附录（如需要） ===
+\appendix
+
+\section{Supplementary Materials}
+% 补充材料
+
+\section{Code Listings}
+% 代码清单
+
+\end{document}

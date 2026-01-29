@@ -1,0 +1,190 @@
+{
+  "models": {
+    "prediction": {
+      "time_series": {
+        "ARIMA": {
+          "full_name": "Autoregressive Integrated Moving Average",
+          "use_case": "短期时间序列预测",
+          "requirements": ["平稳性", "足够数据点"],
+          "python_library": "statsmodels",
+          "complexity": "O(n)",
+          "pros": ["经典方法", "可解释性强", "低数据需求"],
+          "cons": ["需要平稳性", "难以捕捉复杂模式"]
+        },
+        "Prophet": {
+          "full_name": "Facebook Prophet",
+          "use_case": "带季节性的时间序列预测",
+          "requirements": ["日期格式数据"],
+          "python_library": "prophet",
+          "complexity": "O(n)",
+          "pros": ["自动处理节假日", "鲁棒性强", "可解释"],
+          "cons": ["不适合高频数据", "大规模数据慢"]
+        },
+        "LSTM": {
+          "full_name": "Long Short-Term Memory",
+          "use_case": "复杂序列模式学习",
+          "requirements": ["大量训练数据", "GPU推荐"],
+          "python_library": "tensorflow/pytorch",
+          "complexity": "O(n·d²)",
+          "pros": ["捕捉长期依赖", "非线性建模"],
+          "cons": ["黑盒", "需要大量数据", "训练慢"]
+        }
+      },
+      "regression": {
+        "LinearRegression": {
+          "full_name": "Linear Regression",
+          "use_case": "线性关系建模",
+          "python_library": "sklearn",
+          "complexity": "O(n·d²)",
+          "pros": ["简单可解释", "快速"],
+          "cons": ["只能建模线性关系"]
+        },
+        "RandomForest": {
+          "full_name": "Random Forest Regressor",
+          "use_case": "非线性回归，特征重要性",
+          "python_library": "sklearn",
+          "complexity": "O(n·m·log(n))",
+          "pros": ["抗过拟合", "特征重要性", "无需标准化"],
+          "cons": ["内存消耗大", "预测速度慢"]
+        },
+        "XGBoost": {
+          "full_name": "Extreme Gradient Boosting",
+          "use_case": "高精度回归",
+          "python_library": "xgboost",
+          "complexity": "O(n·d·log(n))",
+          "pros": ["高精度", "可处理缺失值", "正则化"],
+          "cons": ["参数调优复杂", "过拟合风险"]
+        }
+      }
+    },
+    "optimization": {
+      "linear": {
+        "LinearProgramming": {
+          "full_name": "Linear Programming",
+          "use_case": "线性约束下的线性目标优化",
+          "python_library": "scipy.optimize.linprog, pulp",
+          "complexity": "O(n³)",
+          "pros": ["全局最优保证", "高效求解"],
+          "cons": ["只能处理线性问题"]
+        },
+        "MILP": {
+          "full_name": "Mixed Integer Linear Programming",
+          "use_case": "含整数变量的线性优化",
+          "python_library": "pulp, gurobi, ortools",
+          "complexity": "NP-hard",
+          "pros": ["可建模离散选择", "工业标准"],
+          "cons": ["大规模问题难解", "可能需要商业求解器"]
+        }
+      },
+      "nonlinear": {
+        "SQP": {
+          "full_name": "Sequential Quadratic Programming",
+          "use_case": "非线性约束优化",
+          "python_library": "scipy.optimize.minimize",
+          "complexity": "O(n³)",
+          "pros": ["可处理非线性约束", "收敛快"],
+          "cons": ["可能陷入局部最优", "需要初始点"]
+        },
+        "GeneticAlgorithm": {
+          "full_name": "Genetic Algorithm",
+          "use_case": "全局优化，复杂搜索空间",
+          "python_library": "deap, pymoo",
+          "complexity": "取决于参数设置",
+          "pros": ["全局搜索", "可处理离散和连续变量"],
+          "cons": ["收敛慢", "参数敏感"]
+        }
+      },
+      "multi_objective": {
+        "NSGA-II": {
+          "full_name": "Non-dominated Sorting Genetic Algorithm II",
+          "use_case": "多目标优化",
+          "python_library": "pymoo, deap",
+          "complexity": "O(M·N²)",
+          "pros": ["生成Pareto前沿", "保持解的多样性"],
+          "cons": ["计算量大", "参数调优"]
+        }
+      }
+    },
+    "evaluation": {
+      "AHP": {
+        "full_name": "Analytic Hierarchy Process",
+        "use_case": "多准则决策，专家判断",
+        "python_library": "pyahp",
+        "pros": ["结构化", "融入专家经验"],
+        "cons": ["主观性强", "一致性检验"]
+      },
+      "TOPSIS": {
+        "full_name": "Technique for Order Preference by Similarity to Ideal Solution",
+        "use_case": "多属性决策排序",
+        "python_library": "topsis",
+        "pros": ["客观", "易于实现"],
+        "cons": ["权重确定主观", "对极值敏感"]
+      },
+      "DEA": {
+        "full_name": "Data Envelopment Analysis",
+        "use_case": "效率评估",
+        "python_library": "pyDEA",
+        "pros": ["无需假设函数形式", "多输入多输出"],
+        "cons": ["对异常值敏感", "不能外推"]
+      }
+    },
+    "network": {
+      "Dijkstra": {
+        "full_name": "Dijkstra's Algorithm",
+        "use_case": "最短路径",
+        "python_library": "networkx",
+        "complexity": "O((V+E)logV)",
+        "pros": ["最优保证", "高效"],
+        "cons": ["不能处理负权边"]
+      },
+      "MaxFlow": {
+        "full_name": "Maximum Flow Algorithm",
+        "use_case": "网络最大流",
+        "python_library": "networkx",
+        "complexity": "O(VE²)",
+        "pros": ["精确解"],
+        "cons": ["不能处理动态网络"]
+      },
+      "Louvain": {
+        "full_name": "Louvain Community Detection",
+        "use_case": "社区发现",
+        "python_library": "python-louvain",
+        "complexity": "O(n·log(n))",
+        "pros": ["快速", "模块度优化"],
+        "cons": ["分辨率限制"]
+      }
+    },
+    "simulation": {
+      "MonteCarlo": {
+        "full_name": "Monte Carlo Simulation",
+        "use_case": "不确定性分析",
+        "python_library": "numpy",
+        "complexity": "O(n)",
+        "pros": ["灵活", "易实现"],
+        "cons": ["需要大量样本", "慢"]
+      },
+      "SystemDynamics": {
+        "full_name": "System Dynamics",
+        "use_case": "系统行为建模",
+        "python_library": "pysd",
+        "pros": ["反馈机制建模", "政策分析"],
+        "cons": ["参数估计难", "简化假设"]
+      },
+      "ABM": {
+        "full_name": "Agent-Based Model",
+        "use_case": "个体行为模拟",
+        "python_library": "mesa",
+        "pros": ["异质性建模", "涌现行为"],
+        "cons": ["计算量大", "验证困难"]
+      }
+    }
+  },
+  "problem_type_recommendations": {
+    "A": ["ODE", "PDE", "FiniteElement", "Optimization"],
+    "B": ["GraphTheory", "DynamicProgramming", "MILP", "Heuristics"],
+    "C": ["MachineLearning", "TimeSeries", "Clustering", "Regression"],
+    "D": ["NetworkFlow", "MILP", "Scheduling", "VRP"],
+    "E": ["MultiObjective", "SystemDynamics", "Sustainability"],
+    "F": ["GameTheory", "ABM", "PolicyAnalysis", "DecisionMaking"]
+  }
+}

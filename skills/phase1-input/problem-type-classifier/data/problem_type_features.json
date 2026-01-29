@@ -1,0 +1,213 @@
+{
+  "problem_types": {
+    "A": {
+      "name": "连续问题",
+      "name_en": "Continuous",
+      "contest": "MCM",
+      "description": "涉及连续数学、物理建模、微分方程的问题",
+      "keywords": {
+        "high_weight": [
+          "continuous", "differential", "derivative", "gradient",
+          "heat", "flow", "diffusion", "wave", "dynamics",
+          "spatial", "distribution", "field", "boundary",
+          "physics", "physical", "rate of change"
+        ],
+        "medium_weight": [
+          "temperature", "pressure", "velocity", "concentration",
+          "equilibrium", "steady state", "transient",
+          "partial differential", "ordinary differential"
+        ],
+        "low_weight": [
+          "smooth", "continuous function", "calculus",
+          "integration", "differentiation"
+        ]
+      },
+      "recommended_models": [
+        "常微分方程(ODE)", "偏微分方程(PDE)", "有限元方法",
+        "有限差分方法", "变分法", "动力系统"
+      ],
+      "common_tools": ["scipy.integrate", "FEniCS", "COMSOL"],
+      "typical_pitfalls": [
+        "边界条件处理不当",
+        "数值稳定性问题",
+        "参数估计困难"
+      ],
+      "suitable_for": "纯理工科背景团队"
+    },
+    "B": {
+      "name": "离散问题",
+      "name_en": "Discrete",
+      "contest": "MCM",
+      "description": "涉及离散数学、算法设计、组合优化的问题",
+      "keywords": {
+        "high_weight": [
+          "discrete", "network", "graph", "path", "route",
+          "schedule", "assignment", "combinatorial", "integer",
+          "algorithm", "search", "traversal"
+        ],
+        "medium_weight": [
+          "node", "edge", "vertex", "connection", "link",
+          "tree", "cycle", "matching", "cover",
+          "sequence", "permutation", "combination"
+        ],
+        "low_weight": [
+          "step", "stage", "phase", "discrete time",
+          "state", "transition"
+        ]
+      },
+      "recommended_models": [
+        "图论模型", "动态规划", "整数规划",
+        "启发式算法", "元胞自动机", "排队论"
+      ],
+      "common_tools": ["networkx", "pulp", "ortools"],
+      "typical_pitfalls": [
+        "计算复杂度爆炸",
+        "NP难问题处理",
+        "解的可行性验证"
+      ],
+      "suitable_for": "计算机科学背景团队"
+    },
+    "C": {
+      "name": "数据问题",
+      "name_en": "Data Insights",
+      "contest": "MCM",
+      "description": "涉及数据分析、机器学习、预测建模的问题",
+      "keywords": {
+        "high_weight": [
+          "data", "dataset", "analyze", "analysis", "pattern",
+          "predict", "forecast", "trend", "time series",
+          "classify", "cluster", "regression", "correlation"
+        ],
+        "medium_weight": [
+          "feature", "variable", "observation", "sample",
+          "training", "testing", "validation", "accuracy",
+          "machine learning", "statistical", "model selection"
+        ],
+        "low_weight": [
+          "big data", "mining", "extraction", "visualization",
+          "insight", "discovery"
+        ]
+      },
+      "recommended_models": [
+        "回归分析", "时间序列(ARIMA/Prophet)", "机器学习(RF/XGBoost)",
+        "聚类分析", "主成分分析", "神经网络"
+      ],
+      "common_tools": ["pandas", "sklearn", "statsmodels", "prophet"],
+      "typical_pitfalls": [
+        "过拟合",
+        "数据泄露",
+        "特征选择不当"
+      ],
+      "suitable_for": "数据科学背景团队"
+    },
+    "D": {
+      "name": "运筹学/网络科学",
+      "name_en": "Operations Research",
+      "contest": "ICM",
+      "description": "涉及运筹优化、网络设计、资源调度的问题",
+      "keywords": {
+        "high_weight": [
+          "optimize", "optimal", "maximize", "minimize",
+          "schedule", "allocate", "assign", "route", "logistics",
+          "network flow", "capacity", "throughput"
+        ],
+        "medium_weight": [
+          "constraint", "objective", "feasible", "solution",
+          "linear programming", "integer programming",
+          "resource", "efficiency", "cost"
+        ],
+        "low_weight": [
+          "operation", "management", "planning",
+          "decision", "strategy"
+        ]
+      },
+      "recommended_models": [
+        "线性规划", "整数规划", "网络流模型",
+        "排队论", "库存模型", "调度模型"
+      ],
+      "common_tools": ["gurobi", "cvxpy", "pulp", "ortools"],
+      "typical_pitfalls": [
+        "模型规模过大",
+        "约束冲突",
+        "目标函数设计"
+      ],
+      "suitable_for": "运筹学/管理科学背景团队"
+    },
+    "E": {
+      "name": "可持续性",
+      "name_en": "Sustainability",
+      "contest": "ICM",
+      "description": "涉及环境可持续发展、生态保护、资源管理的问题",
+      "keywords": {
+        "high_weight": [
+          "sustainability", "sustainable", "environment", "environmental",
+          "climate", "ecosystem", "biodiversity", "conservation",
+          "renewable", "carbon", "emission"
+        ],
+        "medium_weight": [
+          "long-term", "future generation", "impact assessment",
+          "natural resource", "pollution", "degradation",
+          "ecological", "green", "clean energy"
+        ],
+        "low_weight": [
+          "balance", "harmony", "preservation",
+          "restoration", "protection"
+        ]
+      },
+      "recommended_models": [
+        "系统动力学", "多目标优化", "生命周期评估",
+        "生态模型", "碳足迹模型", "可持续发展指标"
+      ],
+      "common_tools": ["scipy", "SALib", "pyomo"],
+      "typical_pitfalls": [
+        "多目标冲突",
+        "长期预测不确定性",
+        "数据获取困难"
+      ],
+      "suitable_for": "跨学科背景团队"
+    },
+    "F": {
+      "name": "政策",
+      "name_en": "Policy",
+      "contest": "ICM",
+      "description": "涉及政策分析、社会科学、公共决策的问题",
+      "keywords": {
+        "high_weight": [
+          "policy", "regulation", "government", "legislation",
+          "social", "public", "community", "stakeholder",
+          "decision", "strategy", "intervention"
+        ],
+        "medium_weight": [
+          "impact", "effect", "consequence", "outcome",
+          "fairness", "equity", "justice", "ethics",
+          "implementation", "enforcement"
+        ],
+        "low_weight": [
+          "society", "citizen", "public interest",
+          "governance", "administration"
+        ]
+      },
+      "recommended_models": [
+        "博弈论", "多准则决策", "Agent-based模拟",
+        "政策评估模型", "利益相关者分析", "情景分析"
+      ],
+      "common_tools": ["mesa", "netlogo", "scipy"],
+      "typical_pitfalls": [
+        "假设过多",
+        "定性因素量化困难",
+        "利益相关者复杂"
+      ],
+      "suitable_for": "社会科学背景团队"
+    }
+  },
+  "classification_weights": {
+    "high_weight": 3.0,
+    "medium_weight": 2.0,
+    "low_weight": 1.0
+  },
+  "confidence_thresholds": {
+    "high": 0.7,
+    "medium": 0.5,
+    "low": 0.3
+  }
+}

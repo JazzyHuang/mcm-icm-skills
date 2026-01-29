@@ -1,0 +1,158 @@
+{
+  "decision_tree": {
+    "root": {
+      "question": "问题的主要目标是什么？",
+      "options": {
+        "prediction": {
+          "question": "预测的是什么类型的变量？",
+          "options": {
+            "time_series": {
+              "question": "数据量有多大？",
+              "options": {
+                "small": {"model": "ARIMA", "confidence": 0.85},
+                "medium": {"model": "Prophet", "confidence": 0.88},
+                "large": {"model": "LSTM", "confidence": 0.82}
+              }
+            },
+            "categorical": {
+              "question": "类别数量？",
+              "options": {
+                "binary": {"model": "LogisticRegression", "confidence": 0.90},
+                "multi": {"model": "RandomForest", "confidence": 0.88}
+              }
+            },
+            "continuous": {
+              "question": "关系的复杂程度？",
+              "options": {
+                "linear": {"model": "LinearRegression", "confidence": 0.92},
+                "nonlinear": {"model": "GradientBoosting", "confidence": 0.87}
+              }
+            }
+          }
+        },
+        "optimization": {
+          "question": "约束条件的特性？",
+          "options": {
+            "linear": {
+              "question": "变量类型？",
+              "options": {
+                "continuous": {"model": "LinearProgramming", "confidence": 0.95},
+                "integer": {"model": "IntegerProgramming", "confidence": 0.90},
+                "mixed": {"model": "MILP", "confidence": 0.88}
+              }
+            },
+            "nonlinear": {
+              "question": "是否凸问题？",
+              "options": {
+                "convex": {"model": "ConvexOptimization", "confidence": 0.92},
+                "nonconvex": {"model": "GlobalOptimization", "confidence": 0.75}
+              }
+            },
+            "multi_objective": {
+              "model": "NSGA-II",
+              "confidence": 0.88,
+              "alternatives": ["WeightedSum", "EpsilonConstraint"]
+            }
+          }
+        },
+        "evaluation": {
+          "question": "评价的维度？",
+          "options": {
+            "single_criterion": {"model": "Ranking", "confidence": 0.90},
+            "multi_criteria": {
+              "question": "是否有专家判断？",
+              "options": {
+                "yes": {"model": "AHP", "confidence": 0.92},
+                "no": {"model": "TOPSIS", "confidence": 0.88}
+              }
+            },
+            "efficiency": {"model": "DEA", "confidence": 0.85}
+          }
+        },
+        "simulation": {
+          "question": "系统的特性？",
+          "options": {
+            "continuous": {"model": "SystemDynamics", "confidence": 0.88},
+            "discrete_event": {"model": "DiscreteEventSimulation", "confidence": 0.85},
+            "agent_based": {"model": "AgentBasedModel", "confidence": 0.82}
+          }
+        },
+        "network": {
+          "question": "网络问题类型？",
+          "options": {
+            "shortest_path": {"model": "Dijkstra", "confidence": 0.95},
+            "max_flow": {"model": "FordFulkerson", "confidence": 0.92},
+            "community": {"model": "Louvain", "confidence": 0.88},
+            "centrality": {"model": "PageRank", "confidence": 0.90}
+          }
+        }
+      }
+    }
+  },
+  "model_database": {
+    "LinearProgramming": {
+      "name": "线性规划",
+      "category": "optimization",
+      "tools": ["scipy.optimize.linprog", "PuLP", "Gurobi"],
+      "complexity": "O(n³)",
+      "pros": ["全局最优", "快速求解", "数学严谨"],
+      "cons": ["只能处理线性关系", "不适用于整数变量"]
+    },
+    "MILP": {
+      "name": "混合整数线性规划",
+      "category": "optimization",
+      "tools": ["Gurobi", "CPLEX", "CBC"],
+      "complexity": "NP-hard",
+      "pros": ["可处理整数约束", "工业标准"],
+      "cons": ["大规模问题求解慢", "可能需要商业求解器"]
+    },
+    "ARIMA": {
+      "name": "自回归积分滑动平均",
+      "category": "prediction",
+      "tools": ["statsmodels", "pmdarima"],
+      "complexity": "O(n)",
+      "pros": ["经典方法", "可解释性强"],
+      "cons": ["需要平稳性", "难以捕捉复杂模式"]
+    },
+    "Prophet": {
+      "name": "Facebook Prophet",
+      "category": "prediction",
+      "tools": ["prophet"],
+      "complexity": "O(n)",
+      "pros": ["自动处理节假日", "鲁棒性强"],
+      "cons": ["黑盒模型", "不适合高频数据"]
+    },
+    "RandomForest": {
+      "name": "随机森林",
+      "category": "prediction",
+      "tools": ["sklearn.ensemble.RandomForestClassifier"],
+      "complexity": "O(n·m·log(n))",
+      "pros": ["抗过拟合", "特征重要性"],
+      "cons": ["解释性一般", "内存占用大"]
+    },
+    "NSGA-II": {
+      "name": "非支配排序遗传算法II",
+      "category": "optimization",
+      "tools": ["pymoo", "DEAP"],
+      "complexity": "O(M·N²)",
+      "pros": ["多目标优化", "Pareto前沿"],
+      "cons": ["参数敏感", "计算量大"]
+    },
+    "AHP": {
+      "name": "层次分析法",
+      "category": "evaluation",
+      "tools": ["pyahp", "custom"],
+      "complexity": "O(n²)",
+      "pros": ["结构清晰", "专家经验融入"],
+      "cons": ["主观性强", "一致性检验"]
+    },
+    "SystemDynamics": {
+      "name": "系统动力学",
+      "category": "simulation",
+      "tools": ["PySD", "scipy.integrate"],
+      "complexity": "O(n·t)",
+      "pros": ["反馈机制", "政策分析"],
+      "cons": ["参数估计难", "简化假设"]
+    }
+  }
+}

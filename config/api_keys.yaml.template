@@ -1,0 +1,30 @@
+# API Keys Configuration Template
+# Copy this file to api_keys.yaml and fill in your keys
+# DO NOT commit api_keys.yaml to version control!
+
+# Semantic Scholar API Key
+# Get yours at: https://www.semanticscholar.org/product/api
+semantic_scholar:
+  api_key: "YOUR_SEMANTIC_SCHOLAR_API_KEY"
+
+# CrossRef API (uses mailto as polite pool identifier)
+crossref:
+  mailto: "your-email@example.com"
+
+# Gurobi License (optional, for commercial solver)
+# Academic licenses are free: https://www.gurobi.com/academia/academic-program-and-licenses/
+gurobi:
+  license_file: "/path/to/gurobi.lic"
+  # Or use environment variables:
+  # GRB_LICENSE_FILE: "/path/to/gurobi.lic"
+
+# OpenAI API (optional, for advanced LLM features)
+openai:
+  api_key: "YOUR_OPENAI_API_KEY"
+  organization: "YOUR_ORG_ID"  # optional
+
+# Anthropic API (optional)
+anthropic:
+  api_key: "YOUR_ANTHROPIC_API_KEY"
+
+# Note: World Bank, OECD, UN Data, and arXiv APIs do not require keys

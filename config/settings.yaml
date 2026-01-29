@@ -1,0 +1,122 @@
+# MCM/ICM Automation System Configuration
+# Version: 2.0.0 (2025-2026 SOTA)
+
+project:
+  name: "mcm-icm-automation"
+  version: "2.0.0"
+  year: 2026
+  description: "美赛论文全自动化写作系统"
+
+# 执行配置
+execution:
+  max_retries: 3
+  retry_delay_base: 2  # 指数退避基数(秒)
+  timeout_per_skill: 300  # 单技能超时(秒)
+  checkpoint_interval: 60  # 检查点间隔(秒)
+  parallel_skills: true
+  lazy_loading: true
+  max_parallel_tasks: 4
+
+# 上下文优化配置 (基于Acon框架)
+context_optimization:
+  max_context_tokens: 50000
+  compression_threshold: 0.7  # Acon压缩阈值
+  just_in_time_loading: true
+  memory_reduction_target: 0.4  # 目标减少40%内存
+
+# 质量阈值配置
+quality_thresholds:
+  abstract_min_iterations: 12  # O奖标准：摘要至少迭代12次
+  grammar_score_min: 7.5  # LAT评分最低要求
+  hallucination_tolerance: 0.0  # 零容忍幻觉
+  citation_verification: true
+  code_verification_levels: 4  # 语法/类型/数值/符号
+
+# 输出配置
+output:
+  figure_dpi: 300
+  figure_format: "pdf"
+  latex_compiler: "xelatex"
+  biber_backend: true
+  max_pages: 25
+  min_font_size: 12
+
+# API速率限制
+api_rate_limits:
+  semantic_scholar: 100  # 每分钟请求数
+  crossref: 50
+  worldbank: 200
+  arxiv: 30
+
+# 数据源配置
+data_sources:
+  primary:
+    - name: "World Bank"
+      url: "https://api.worldbank.org/v2/"
+      requires_key: false
+    - name: "OECD"
+      url: "https://sdmx.oecd.org/public/rest/"
+      requires_key: false
+    - name: "UN Data"
+      url: "https://data.un.org/ws/rest/"
+      requires_key: false
+  literature:
+    - name: "Semantic Scholar"
+      url: "https://api.semanticscholar.org/"
+      requires_key: true
+    - name: "CrossRef"
+      url: "https://api.crossref.org/"
+      requires_key: false
+    - name: "arXiv"
+      url: "https://export.arxiv.org/api/"
+      requires_key: false
+
+# 模型求解器配置
+solvers:
+  optimization:
+    primary: "scipy"
+    fallback: ["pulp", "cvxpy"]
+    commercial: ["gurobi"]  # 可选
+  ml:
+    primary: "sklearn"
+    deep_learning: "pytorch"
+  time_series:
+    primary: "statsmodels"
+    advanced: ["prophet", "darts"]
+
+# 美赛题型配置
+problem_types:
+  MCM:
+    A:
+      name: "连续问题"
+      methods: ["ODE", "PDE", "有限元", "微分方程"]
+      suitable_for: "纯理工科"
+    B:
+      name: "离散问题"
+      methods: ["图论", "动态规划", "元胞自动机", "组合优化"]
+      suitable_for: "CS背景"
+    C:
+      name: "数据问题"
+      methods: ["机器学习", "时间序列", "神经网络", "数据挖掘"]
+      suitable_for: "数据科学"
+  ICM:
+    D:
+      name: "运筹学/网络科学"
+      methods: ["整数规划", "网络流", "调度优化"]
+      suitable_for: "运筹学"
+    E:
+      name: "可持续性"
+      methods: ["系统动力学", "多目标优化", "环境建模"]
+      suitable_for: "跨学科"
+    F:
+      name: "政策"
+      methods: ["博弈论", "仿真", "定性分析", "决策模型"]
+      suitable_for: "社科背景"
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "output/logs/mcm_automation.log"
+  max_size_mb: 100
+  backup_count: 5
