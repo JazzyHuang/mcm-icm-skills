@@ -302,7 +302,7 @@ class PINNSolver:
                         ic_values = ic_result.to(self.device)
                     else:
                         # 处理标量或其他类型
-                        ic_values = torch.tensor(ic_result, dtype=torch.float32, device=self.device).expand_like(x_ic)
+                        ic_values = torch.tensor(ic_result, dtype=torch.float32, device=self.device).expand_as(x_ic)
                 else:
                     ic_values = ic_func
                 loss_ic = torch.mean((u_ic - ic_values) ** 2)
