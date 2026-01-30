@@ -200,8 +200,11 @@ class QualityGateChecker:
         }
         
         # 获取实际值（从state或results中查找）
+        # 使用 None 检查而非 or，避免 0 等假值被错误跳过
         value_key = criterion.get('name')
-        actual_value = results.get(value_key) or state.get(value_key)
+        actual_value = results.get(value_key)
+        if actual_value is None:
+            actual_value = state.get(value_key)
         criterion_result['actual_value'] = actual_value
         
         # 检查各种条件
@@ -374,22 +377,25 @@ class MCMOrchestrator:
                         # 尝试回退
                         fallback_phase = await self._handle_gate_failure(phase, gate_results, state)
                         
-                        if fallback_phase:
-                            logger.info(f"Falling back to phase {fallback_phase}")
-                            phase = fallback_phase
-                            continue
-                        else:
-                            # 无法回退，记录失败并继续（或暂停）
-                            logger.error(f"Phase {phase} failed and cannot fallback")
-                            self.execution_log.append({
-                                'phase': phase,
-                                'duration_seconds': phase_duration,
-                                'status': 'failed',
-                                'gate_results': gate_results
-                            })
-                            # 根据配置决定是继续还是停止
-                            if self.config.get('execution', {}).get('stop_on_gate_failure', False):
-                                return self._create_failure_response(phase, gate_results, state)
+                    if fallback_phase:
+                        logger.info(f"Falling back to phase {fallback_phase}")
+                        phase = fallback_phase
+                        continue
+                    else:
+                        # 无法回退，记录失败并继续（或暂停）
+                        logger.error(f"Phase {phase} failed and cannot fallback")
+                        self.execution_log.append({
+                            'phase': phase,
+                            'duration_seconds': phase_duration,
+                            'status': 'failed',
+                            'gate_results': gate_results
+                        })
+                        # 根据配置决定是继续还是停止
+                        if self.config.get('execution', {}).get('stop_on_gate_failure', False):
+                            return self._create_failure_response(phase, gate_results, state)
+                        # 不停止时，跳过成功处理逻辑，继续下一阶段
+                        phase += 1
+                        continue
                 
                 # 门禁通过或未启用门禁
                 state['completed_phases'].append(phase)
@@ -547,6 +553,9 @@ class MCMOrchestrator:
                             results[skill] = {'status': 'failed', 'error': str(result)}
                         else:
                             results[skill] = result
+                    # 并行组执行完成后更新 state，确保后续组可访问这些结果
+                    for skill in group:
+                        state.update({skill: results[skill]})
                 else:
                     # 单个执行
                     for skill in group:
