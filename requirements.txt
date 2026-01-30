@@ -1,90 +1,121 @@
-# MCM/ICM Skills - Dependencies
-# 美赛技能系统依赖清单
+# MCM/ICM Skills - Unified Dependencies
+# 美赛技能系统统一依赖清单
+# Python 3.10+ required
+# 
+# 注意: 此文件是主依赖文件，合并自根目录和scripts/requirements.txt
+# 最后更新: 2026-01-30
 
-# ============ 核心依赖 ============
-numpy>=1.21.0
-pandas>=1.5.0
-scipy>=1.9.0
-scikit-learn>=1.1.0
+# ============ 核心计算 ============
+numpy>=1.26.0
+pandas>=2.2.0
+scipy>=1.12.0
+scikit-learn>=1.4.0
+sympy>=1.12                    # 符号计算验证
+
+# ============ 数学优化 ============
+cvxpy>=1.4.0                   # 凸优化
+pulp>=2.7.0                    # 开源LP/MILP
+ortools>=9.8                   # Google OR-Tools
+pymoo>=0.6.0                   # 多目标优化（NSGA-II/III, MOEA/D）
+optuna>=3.3.0                  # 超参数优化/贝叶斯优化
+# gurobipy>=11.0.0             # 商业求解器(可选，需要许可证)
+
+# ============ 机器学习 ============
+statsmodels>=0.14.0
+xgboost>=2.0.0
+lightgbm>=4.0.0
 
 # ============ 深度学习 ============
-torch>=2.0.0
-# tensorflow>=2.12.0  # 可选，如果需要TensorFlow
-pytorch-forecasting>=1.0.0  # Temporal Fusion Transformer
+torch>=2.0.0                   # PyTorch
+pytorch-forecasting>=1.0.0    # Temporal Fusion Transformer
 pytorch-lightning>=2.0.0
+# tensorflow>=2.15.0           # TensorFlow (可选)
 
 # ============ 物理信息神经网络 ============
-deepxde>=1.10.0  # PINN框架
-# neuraloperator>=0.3.0  # 神经算子（FNO, DeepONet）
+deepxde>=1.10.0               # PINN框架
+# neuraloperator>=0.3.0       # 神经算子（FNO, DeepONet）
 
 # ============ 图神经网络 ============
-torch-geometric>=2.3.0  # PyTorch Geometric
-networkx>=3.0  # 图操作
+torch-geometric>=2.3.0        # PyTorch Geometric
+networkx>=3.2                 # 图操作
+python-igraph>=0.11.0         # 高级图布局算法
 
 # ============ 强化学习 ============
-stable-baselines3>=2.0.0  # RL算法库
-gymnasium>=0.28.0  # 环境接口
-# pettingzoo>=1.23.0  # 多智能体环境
+stable-baselines3>=2.0.0      # RL算法库
+gymnasium>=0.28.0             # 环境接口
+# pettingzoo>=1.23.0          # 多智能体环境
 
 # ============ 因果推断 ============
-econml>=0.14.0  # Microsoft因果推断库
-# causalml>=0.14.0  # Uber因果推断库
-# dowhy>=0.10.0  # 因果图建模
+econml>=0.14.0                # Microsoft因果推断库
+# causalml>=0.14.0            # Uber因果推断库
+# dowhy>=0.10.0               # 因果图建模
 
 # ============ 可解释AI ============
-shap>=0.42.0  # SHAP解释
-lime>=0.2.0  # LIME解释
-captum>=0.6.0  # PyTorch模型解释
-
-# ============ 优化库 ============
-pymoo>=0.6.0  # 多目标优化（NSGA-II/III, MOEA/D）
-cvxpy>=1.4.0  # 凸优化
-pulp>=2.7.0  # 线性规划
-optuna>=3.3.0  # 超参数优化/贝叶斯优化
+shap>=0.42.0                  # SHAP解释
+lime>=0.2.0                   # LIME解释
+captum>=0.6.0                 # PyTorch模型解释
 
 # ============ 时间序列 ============
-statsmodels>=0.14.0  # ARIMA等传统方法
-prophet>=1.1.0  # Facebook Prophet
-
-# ============ 可视化 ============
-matplotlib>=3.7.0  # 基础绑图
-seaborn>=0.12.0  # 统计绑图
-plotly>=5.15.0  # 交互式绘图
-kaleido>=0.2.1  # Plotly静态导出
-altair>=5.0.0  # 声明式可视化
-
-# ============ 地理可视化 ============
-geopandas>=0.13.0  # 地理数据处理
-folium>=0.14.0  # 交互式地图
-# contextily>=1.3.0  # 底图服务
-
-# ============ 图布局 ============
-python-igraph>=0.10.0  # 高级图布局算法
+prophet>=1.1.5                # Facebook Prophet
+darts>=0.28.0                 # 时间序列库
 
 # ============ 不确定性量化 ============
-mapie>=0.7.0  # 保形预测
-# uncertainty-toolbox>=0.1.1  # 不确定性工具包
+mapie>=0.7.0                  # 保形预测
+SALib>=1.5.0                  # Sobol, Morris等方法
 
-# ============ 敏感性分析 ============
-SALib>=1.4.0  # Sobol, Morris等方法
+# ============ 数据可视化 ============
+matplotlib>=3.8.0             # 基础绑图
+seaborn>=0.13.0               # 统计绑图
+plotly>=5.18.0                # 交互式绘图
+kaleido>=0.2.1                # Plotly静态导出
+altair>=5.2.0                 # 声明式可视化
 
-# ============ 文档和报告 ============
-Jinja2>=3.1.0  # 模板引擎
-PyYAML>=6.0  # YAML配置
-python-docx>=0.8.11  # Word文档生成
-pylatex>=1.4.1  # LaTeX生成
+# ============ 地理可视化 ============
+geopandas>=0.13.0             # 地理数据处理
+folium>=0.14.0                # 交互式地图
+# contextily>=1.3.0           # 底图服务
 
-# ============ 数据获取 ============
-requests>=2.31.0  # HTTP请求
-wbgapi>=1.0.0  # World Bank API
-# yfinance>=0.2.0  # 金融数据
+# ============ 文献检索 ============
+requests>=2.31.0              # HTTP请求
+semanticscholar>=0.8.0        # Semantic Scholar API
+habanero>=1.2.0               # CrossRef API
+arxiv>=2.1.0                  # arXiv API
+wbgapi>=1.0.0                 # World Bank API
+tenacity>=8.2.0               # API重试机制
+
+# ============ LaTeX/文档处理 ============
+Jinja2>=3.1.0                 # 模板引擎
+PyYAML>=6.0.1                 # YAML配置
+python-docx>=1.1.0            # Word文档生成
+pylatex>=1.4.2                # LaTeX生成
+latexcodec>=2.0.1
+bibtexparser>=2.0.0
+
+# ============ PDF处理 ============
+PyPDF2>=3.0.0
+pdfplumber>=0.10.0
+pymupdf>=1.23.0               # PDF处理增强
+
+# ============ 语言处理 ============
+language-tool-python>=2.8.0   # 语法检查
+spacy>=3.7.0                  # NLP
+
+# ============ 异步和网络 ============
+aiohttp>=3.9.0                # 异步HTTP
+httpx>=0.26.0                 # 现代HTTP客户端
 
 # ============ 工具库 ============
-tqdm>=4.65.0  # 进度条
-colorlog>=6.7.0  # 彩色日志
-python-dotenv>=1.0.0  # 环境变量
+tqdm>=4.66.0                  # 进度条
+colorlog>=6.7.0               # 彩色日志
+python-dotenv>=1.0.0          # 环境变量
+rich>=13.7.0                  # 美化输出
+click>=8.1.0                  # CLI工具
+pydantic>=2.5.0               # 数据验证
 
-# ============ 开发依赖（可选）============
-# pytest>=7.4.0
-# black>=23.0.0
-# mypy>=1.5.0
+# ============ 开发工具（可选）============
+# pytest>=8.0.0
+# pytest-asyncio>=0.23.0
+# pytest-cov>=4.1.0
+# black>=24.0.0                # 代码格式化
+# isort>=5.13.0                # 导入排序
+# mypy>=1.8.0                  # 类型检查

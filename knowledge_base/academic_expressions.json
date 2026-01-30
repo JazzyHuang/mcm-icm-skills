@@ -1,9 +1,10 @@
 {
   "metadata": {
-    "version": "1.0",
+    "version": "1.1",
     "description": "学术表达库：按场景分类的学术英语表达，用于提升论文语言质量",
-    "total_expressions": 200,
-    "categories": 12
+    "total_expressions": 54,
+    "categories": 12,
+    "last_updated": "2026-01-30"
   },
   
   "introduction": {

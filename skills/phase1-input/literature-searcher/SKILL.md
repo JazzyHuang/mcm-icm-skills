@@ -120,21 +120,120 @@ queries = [
 }
 ```
 
-## 使用脚本
+## 使用示例
+
+### 示例1：使用Semantic Scholar搜索
 
 ```python
-from scripts.semantic_scholar import search_papers
-from scripts.citation_formatter import format_bibtex
+from scripts.semantic_scholar import search_papers, generate_bibtex
 
-# 搜索论文
+# 搜索与优化相关的论文
 papers = search_papers(
     query="solar panel optimization mathematical model",
     limit=20,
     year_range=(2020, 2024)
 )
 
-# 生成BibTeX
-bibtex = format_bibtex(papers)
+# 打印搜索结果
+for paper in papers:
+    print(f"标题: {paper['title']}")
+    print(f"作者: {', '.join(paper['authors'][:3])}")
+    print(f"年份: {paper['year']}, 引用数: {paper['citation_count']}")
+    print(f"DOI: {paper['doi']}")
+    print("---")
+
+# 导出为BibTeX文件
+for paper in papers:
+    bibtex = generate_bibtex(paper)
+    print(bibtex)
+```
+
+### 示例2：使用CrossRef API搜索
+
+```python
+from scripts.crossref_api import search_works, search_and_export
+
+# 搜索最近5年的相关文献
+works = search_works(
+    query="machine learning renewable energy",
+    limit=15,
+    filter_params={'from-pub-date': '2020'}
+)
+
+# 导出为BibTeX文件
+result = search_and_export(
+    query="machine learning renewable energy",
+    output_file="references.bib",
+    limit=15,
+    year_from=2020
+)
+print(f"找到 {result['works_found']} 篇论文，已导出到 {result['output_file']}")
+```
+
+### 示例3：使用arXiv API搜索预印本
+
+```python
+from scripts.arxiv_api import search_papers, search_and_export
+
+# 搜索机器学习相关预印本
+papers = search_papers(
+    query="neural network optimization",
+    limit=10,
+    categories=['cs.LG', 'stat.ML']  # 限制到机器学习分类
+)
+
+# 获取特定论文的详情
+from scripts.arxiv_api import get_paper_by_id
+paper = get_paper_by_id("2301.12345")
+if paper:
+    print(f"标题: {paper['title']}")
+    print(f"摘要: {paper['abstract'][:200]}...")
+```
+
+### 示例4：使用PubMed搜索医学文献
+
+```python
+from scripts.pubmed_api import search_papers, search_and_export
+
+# 搜索流行病学建模相关文献
+papers = search_papers(
+    query="epidemiological modeling COVID-19",
+    limit=10,
+    date_range=(2020, 2024)
+)
+
+# 导出结果
+for paper in papers:
+    print(f"PMID: {paper['pmid']}")
+    print(f"标题: {paper['title']}")
+    print(f"期刊: {paper['journal']}")
+```
+
+### 示例5：多源综合搜索
+
+```python
+from scripts.semantic_scholar import search_papers as ss_search
+from scripts.crossref_api import search_works as cr_search
+from scripts.arxiv_api import search_papers as arxiv_search
+
+# 从多个源搜索
+query = "optimization algorithm energy systems"
+
+# Semantic Scholar
+ss_papers = ss_search(query, limit=5)
+print(f"Semantic Scholar: {len(ss_papers)} 篇")
+
+# CrossRef
+cr_works = cr_search(query, limit=5)
+print(f"CrossRef: {len(cr_works)} 篇")
+
+# arXiv
+arxiv_papers = arxiv_search(query, limit=5)
+print(f"arXiv: {len(arxiv_papers)} 篇")
+
+# 合并去重（基于DOI或标题）
+all_papers = ss_papers + cr_works + arxiv_papers
+# ... 去重逻辑 ...
 ```
 
 ## 引用验证
@@ -143,7 +242,21 @@ bibtex = format_bibtex(papers)
 - 检查作者信息完整性
 - 确认出版信息准确
 
-## 相关技能
+## 与其他技能集成
 
-- `citation-validator` - 引用验证
-- `citation-manager` - 引用管理
+- **前置技能**: `problem-parser` 提供关键词
+- **后续技能**: 
+  - `citation-validator` - 验证引用真实性
+  - `citation-diversity-validator` - 验证引用多样性
+  - `citation-manager` - 管理最终引用列表
+
+## 注意事项
+
+- API调用有速率限制，请参考 `config/shared_constants.yaml`
+- 推荐使用Semantic Scholar作为主要搜索源
+- 对于特定领域（如医学），建议使用专业数据库（如PubMed）
+
+## 更新日志
+
+- 2026-01-30: 添加crossref_api.py、arxiv_api.py、pubmed_api.py
+- 2026-01-30: 添加使用示例

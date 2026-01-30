@@ -50,8 +50,9 @@ class BSplineBasis(nn.Module):
         return bases
         
     def _compute_bspline(self, x, k):
-        """递归计算k阶B-spline"""
+        """递归计算k阶B-spline（带数值稳定性保护）"""
         grid = self.grid
+        eps = 1e-8  # 数值稳定性常数
         
         if k == 0:
             # 0阶: 指示函数
@@ -60,15 +61,36 @@ class BSplineBasis(nn.Module):
             # 递归
             bases_prev = self._compute_bspline(x, k - 1)
             
-            # 左侧系数
+            # 左侧系数（添加数值稳定性保护）
             left_num = x - grid[:-(k+1)]
             left_den = grid[k:-1] - grid[:-(k+1)]
-            left = left_num / (left_den + 1e-8) * bases_prev[..., :-1]
+            # 使用安全除法：当分母接近零时返回0
+            safe_left_den = torch.where(
+                torch.abs(left_den) < eps,
+                torch.ones_like(left_den),  # 避免除零
+                left_den
+            )
+            left_coef = torch.where(
+                torch.abs(left_den) < eps,
+                torch.zeros_like(left_num),  # 分母为零时系数为0
+                left_num / safe_left_den
+            )
+            left = left_coef * bases_prev[..., :-1]
             
-            # 右侧系数
+            # 右侧系数（添加数值稳定性保护）
             right_num = grid[k+1:] - x
             right_den = grid[k+1:] - grid[1:-k]
-            right = right_num / (right_den + 1e-8) * bases_prev[..., 1:]
+            safe_right_den = torch.where(
+                torch.abs(right_den) < eps,
+                torch.ones_like(right_den),
+                right_den
+            )
+            right_coef = torch.where(
+                torch.abs(right_den) < eps,
+                torch.zeros_like(right_num),
+                right_num / safe_right_den
+            )
+            right = right_coef * bases_prev[..., 1:]
             
             bases = left + right
             
@@ -257,7 +279,7 @@ class KAN(nn.Module):
         return fig
         
     def save_results(self, output_path: str):
-        """保存结果"""
+        """保存结果元数据（不包含模型权重）"""
         results = {
             'model': {
                 'type': 'KAN',
@@ -271,9 +293,63 @@ class KAN(nn.Module):
                 'final_loss': self.training_history['loss'][-1] if self.training_history['loss'] else None
             }
         }
-        with open(output_path, 'w') as f:
+        with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)
         return results
+    
+    def save_model(self, path: str):
+        """
+        保存完整模型（包含权重、优化器状态和配置）
+        
+        Args:
+            path: 保存路径（建议使用.pt或.pth后缀）
+        """
+        checkpoint = {
+            'model_state_dict': self.state_dict(),
+            'config': {
+                'layers': self.layers_config,
+                'grid_size': self.grid_size,
+                'spline_order': self.spline_order,
+                'device': str(self.device)
+            },
+            'training_history': self.training_history,
+            'total_params': self.count_parameters()
+        }
+        torch.save(checkpoint, path)
+        print(f"Model saved to {path}")
+    
+    @classmethod
+    def load_model(cls, path: str, device: str = 'auto') -> 'KAN':
+        """
+        加载模型
+        
+        Args:
+            path: 模型路径
+            device: 设备（'auto', 'cpu', 'cuda'）
+            
+        Returns:
+            加载的KAN模型
+        """
+        checkpoint = torch.load(path, map_location='cpu')
+        config = checkpoint['config']
+        
+        # 创建模型实例
+        model = cls(
+            layers=config['layers'],
+            grid_size=config['grid_size'],
+            spline_order=config['spline_order'],
+            device=device
+        )
+        
+        # 加载权重
+        model.load_state_dict(checkpoint['model_state_dict'])
+        
+        # 恢复训练历史
+        if 'training_history' in checkpoint:
+            model.training_history = checkpoint['training_history']
+        
+        print(f"Model loaded from {path}")
+        return model
 
 
 class KANSymbolicRegression:
@@ -355,7 +431,13 @@ class KANSymbolicRegression:
                 if mse < best_score and abs(coef[0]) > 0.1:
                     best_score = mse
                     best_match = f"{coef[0]:.2f}*{name}"
-            except:
+            except (ValueError, np.linalg.LinAlgError, RuntimeWarning, FloatingPointError) as e:
+                # 跳过计算失败的候选函数（如log对负数、数值溢出等）
+                continue
+            except Exception as e:
+                # 记录意外错误但继续尝试其他候选函数
+                import logging
+                logging.getLogger(__name__).warning(f"Unexpected error matching function {name}: {e}")
                 continue
                 
         return best_match if best_score < 0.5 else None

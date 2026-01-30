@@ -296,14 +296,21 @@ class AdvancedCharts:
             
             # 计算水平偏移以避免重叠
             n = len(values)
+            if n == 0:
+                continue
+                
             jitter = np.zeros(n)
             
             # 简单的避免重叠算法
             sorted_idx = np.argsort(values)
             values_sorted = values[sorted_idx]
             
+            # 计算阈值（添加除零保护）
+            value_range = values.max() - values.min()
+            threshold = value_range * 0.02 if value_range > 0 else 0.01
+            
             for j in range(1, n):
-                if abs(values_sorted[j] - values_sorted[j-1]) < (values.max() - values.min()) * 0.02:
+                if abs(values_sorted[j] - values_sorted[j-1]) < threshold:
                     jitter[sorted_idx[j]] = jitter[sorted_idx[j-1]] + 0.1
                     if jitter[sorted_idx[j]] > 0.3:
                         jitter[sorted_idx[j]] = -0.3

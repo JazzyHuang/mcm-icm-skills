@@ -5,9 +5,20 @@ DOI验证器
 
 import logging
 import re
+import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import requests
+# 添加common模块路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from common.api_utils import (
+    api_request_with_retry,
+    APIRequestError,
+    safe_get_nested,
+    safe_list_get,
+    DEFAULT_TIMEOUT,
+    DEFAULT_MAX_RETRIES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,33 +45,55 @@ def validate_doi(doi: str) -> Tuple[bool, Optional[Dict]]:
     url = f"{CROSSREF_URL}/{doi}"
     
     try:
-        response = requests.get(url, timeout=10)
+        data = api_request_with_retry(
+            url,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True,
+            raise_for_status=False  # 手动处理404
+        )
         
-        if response.status_code == 200:
-            data = response.json()
-            message = data.get('message', {})
+        # 检查是否为Response对象（非JSON响应）
+        if not isinstance(data, dict):
+            # 检查响应状态码
+            if hasattr(data, 'status_code'):
+                if data.status_code == 404:
+                    logger.warning(f"DOI not found: {doi}")
+                    return False, None
+                else:
+                    logger.error(f"Error validating DOI {doi}: {data.status_code}")
+                    return False, None
+            return False, None
+        
+        message = data.get('message', {})
+        
+        # 安全提取标题和期刊名
+        title_list = message.get('title')
+        title = safe_list_get(title_list, 0, '') if title_list else ''
+        
+        venue_list = message.get('container-title')
+        venue = safe_list_get(venue_list, 0, '') if venue_list else ''
+        
+        metadata = {
+            'doi': message.get('DOI'),
+            'title': title,
+            'authors': extract_authors(message),
+            'year': extract_year(message),
+            'venue': venue,
+            'type': message.get('type', ''),
+            'publisher': message.get('publisher', '')
+        }
+        
+        return True, metadata
             
-            metadata = {
-                'doi': message.get('DOI'),
-                'title': message.get('title', [''])[0] if message.get('title') else '',
-                'authors': extract_authors(message),
-                'year': extract_year(message),
-                'venue': message.get('container-title', [''])[0] if message.get('container-title') else '',
-                'type': message.get('type', ''),
-                'publisher': message.get('publisher', '')
-            }
-            
-            return True, metadata
-            
-        elif response.status_code == 404:
+    except APIRequestError as e:
+        if hasattr(e, 'status_code') and e.status_code == 404:
             logger.warning(f"DOI not found: {doi}")
             return False, None
-        else:
-            logger.error(f"Error validating DOI {doi}: {response.status_code}")
-            return False, None
-            
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error validating DOI: {e}")
+        logger.error(f"Error validating DOI {doi}: {e}")
+        return False, None
+    except Exception as e:
+        logger.error(f"Unexpected error validating DOI: {e}")
         return False, None
 
 
@@ -90,9 +123,13 @@ def extract_year(message: Dict) -> Optional[int]:
     """提取发表年份"""
     # 尝试不同的日期字段
     for field in ['published-print', 'published-online', 'created']:
-        date_parts = message.get(field, {}).get('date-parts', [[]])
-        if date_parts and date_parts[0]:
-            return date_parts[0][0]
+        date_parts = safe_get_nested(message, field, 'date-parts', default=[[]])
+        if date_parts:
+            first_date = safe_list_get(date_parts, 0, [])
+            if first_date:
+                year = safe_list_get(first_date, 0)
+                if year is not None:
+                    return year
     return None
 
 

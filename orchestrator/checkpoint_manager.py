@@ -5,7 +5,10 @@
 
 import json
 import logging
+import os
+import re
 import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -25,10 +28,40 @@ class CheckpointManager:
         """
         self.checkpoint_dir = Path(checkpoint_dir or 'output/checkpoints')
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    
+    def _sanitize_checkpoint_name(self, name: str) -> str:
+        """
+        清理检查点名称，防止路径注入攻击
+        
+        Args:
+            name: 原始检查点名称
+            
+        Returns:
+            清理后的安全名称
+            
+        Raises:
+            ValueError: 如果名称包含非法字符
+        """
+        # 移除路径遍历字符和特殊字符，只保留字母、数字、下划线和连字符
+        sanitized = re.sub(r'[^\w\-]', '_', name)
+        
+        # 检查是否包含路径遍历尝试
+        if '..' in sanitized or sanitized.startswith('/') or sanitized.startswith('\\'):
+            raise ValueError(f"Invalid checkpoint name: {name}")
+        
+        # 检查名称长度
+        if len(sanitized) > 200:
+            raise ValueError(f"Checkpoint name too long: {len(name)} characters (max 200)")
+        
+        # 确保名称不为空
+        if not sanitized:
+            raise ValueError("Checkpoint name cannot be empty")
+        
+        return sanitized
         
     def save(self, state: Dict[str, Any], checkpoint_name: str) -> Path:
         """
-        保存检查点
+        保存检查点（使用原子操作确保数据完整性）
         
         Args:
             state: 状态字典
@@ -36,28 +69,58 @@ class CheckpointManager:
             
         Returns:
             检查点文件路径
+            
+        Raises:
+            ValueError: 如果检查点名称无效
         """
+        # 清理检查点名称，防止路径注入
+        safe_name = self._sanitize_checkpoint_name(checkpoint_name)
+        
         # 创建检查点数据
         checkpoint_data = {
-            'name': checkpoint_name,
+            'name': safe_name,
             'timestamp': datetime.now().isoformat(),
             'state': state
         }
         
         # 生成文件名
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"{checkpoint_name}_{timestamp}.json"
+        filename = f"{safe_name}_{timestamp}.json"
         filepath = self.checkpoint_dir / filename
         
-        # 保存到文件
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(checkpoint_data, f, indent=2, ensure_ascii=False, default=str)
+        # 使用原子操作保存到文件（临时文件 + 重命名）
+        try:
+            # 创建临时文件在同一目录下（确保在同一文件系统，重命名才是原子的）
+            fd, tmp_path = tempfile.mkstemp(suffix='.tmp', dir=self.checkpoint_dir)
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                    json.dump(checkpoint_data, f, indent=2, ensure_ascii=False, default=str)
+                # 原子重命名
+                shutil.move(tmp_path, filepath)
+            except Exception:
+                # 清理临时文件
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+                raise
+        except (OSError, IOError) as e:
+            logger.error(f"Failed to save checkpoint: {e}")
+            raise
             
-        # 更新最新检查点链接
-        latest_link = self.checkpoint_dir / f"{checkpoint_name}_latest.json"
-        if latest_link.exists():
-            latest_link.unlink()
-        shutil.copy(filepath, latest_link)
+        # 更新最新检查点链接（也使用原子操作）
+        latest_link = self.checkpoint_dir / f"{safe_name}_latest.json"
+        try:
+            fd, tmp_latest = tempfile.mkstemp(suffix='.tmp', dir=self.checkpoint_dir)
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as f:
+                    json.dump(checkpoint_data, f, indent=2, ensure_ascii=False, default=str)
+                shutil.move(tmp_latest, latest_link)
+            except Exception:
+                if os.path.exists(tmp_latest):
+                    os.unlink(tmp_latest)
+                raise
+        except (OSError, IOError) as e:
+            logger.warning(f"Failed to update latest checkpoint link: {e}")
+            # 不抛出异常，主检查点已保存成功
         
         logger.info(f"Checkpoint saved: {filepath}")
         return filepath
@@ -72,19 +135,42 @@ class CheckpointManager:
             
         Returns:
             状态字典，如果不存在返回None
+            
+        Raises:
+            ValueError: 如果检查点名称无效
         """
+        # 清理检查点名称，防止路径注入
+        safe_name = self._sanitize_checkpoint_name(checkpoint_name)
+        
         if specific_timestamp:
-            filename = f"{checkpoint_name}_{specific_timestamp}.json"
+            # 也清理时间戳参数
+            safe_timestamp = re.sub(r'[^\w\-]', '_', specific_timestamp)
+            filename = f"{safe_name}_{safe_timestamp}.json"
             filepath = self.checkpoint_dir / filename
         else:
-            filepath = self.checkpoint_dir / f"{checkpoint_name}_latest.json"
+            filepath = self.checkpoint_dir / f"{safe_name}_latest.json"
+        
+        # 确保路径在检查点目录内（额外安全检查）
+        try:
+            filepath = filepath.resolve()
+            checkpoint_dir_resolved = self.checkpoint_dir.resolve()
+            if not str(filepath).startswith(str(checkpoint_dir_resolved)):
+                logger.error(f"Path traversal attempt detected: {filepath}")
+                return None
+        except (OSError, ValueError) as e:
+            logger.error(f"Path resolution error: {e}")
+            return None
             
         if not filepath.exists():
             logger.warning(f"Checkpoint not found: {filepath}")
             return None
-            
-        with open(filepath, 'r', encoding='utf-8') as f:
-            checkpoint_data = json.load(f)
+        
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                checkpoint_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            logger.error(f"Failed to load checkpoint {filepath}: {e}")
+            return None
             
         logger.info(f"Checkpoint loaded: {filepath}")
         return checkpoint_data.get('state')
@@ -133,24 +219,53 @@ class CheckpointManager:
             
         Returns:
             是否删除成功
+            
+        Raises:
+            ValueError: 如果检查点名称无效
         """
+        # 清理检查点名称，防止路径注入
+        safe_name = self._sanitize_checkpoint_name(checkpoint_name)
+        
         if specific_timestamp:
-            filename = f"{checkpoint_name}_{specific_timestamp}.json"
+            # 也清理时间戳参数
+            safe_timestamp = re.sub(r'[^\w\-]', '_', specific_timestamp)
+            filename = f"{safe_name}_{safe_timestamp}.json"
             filepath = self.checkpoint_dir / filename
             
+            # 确保路径在检查点目录内
+            try:
+                filepath = filepath.resolve()
+                if not str(filepath).startswith(str(self.checkpoint_dir.resolve())):
+                    logger.error(f"Path traversal attempt detected")
+                    return False
+            except (OSError, ValueError):
+                return False
+            
             if filepath.exists():
-                filepath.unlink()
-                logger.info(f"Checkpoint deleted: {filepath}")
-                return True
+                try:
+                    filepath.unlink()
+                    logger.info(f"Checkpoint deleted: {filepath}")
+                    return True
+                except OSError as e:
+                    logger.error(f"Failed to delete checkpoint: {e}")
+                    return False
         else:
             # 删除所有同名检查点
             deleted = False
-            for filepath in self.checkpoint_dir.glob(f"{checkpoint_name}*.json"):
-                filepath.unlink()
-                deleted = True
+            # 使用安全的glob模式
+            pattern = f"{safe_name}*.json"
+            for filepath in self.checkpoint_dir.glob(pattern):
+                try:
+                    # 确保路径在检查点目录内
+                    filepath = filepath.resolve()
+                    if str(filepath).startswith(str(self.checkpoint_dir.resolve())):
+                        filepath.unlink()
+                        deleted = True
+                except (OSError, ValueError) as e:
+                    logger.warning(f"Failed to delete {filepath}: {e}")
                 
             if deleted:
-                logger.info(f"All checkpoints for '{checkpoint_name}' deleted")
+                logger.info(f"All checkpoints for '{safe_name}' deleted")
             return deleted
             
         return False
@@ -225,6 +340,11 @@ class CheckpointManager:
             
         Returns:
             是否存在
+            
+        Raises:
+            ValueError: 如果检查点名称无效
         """
-        latest = self.checkpoint_dir / f"{checkpoint_name}_latest.json"
+        # 清理检查点名称，防止路径注入
+        safe_name = self._sanitize_checkpoint_name(checkpoint_name)
+        latest = self.checkpoint_dir / f"{safe_name}_latest.json"
         return latest.exists()

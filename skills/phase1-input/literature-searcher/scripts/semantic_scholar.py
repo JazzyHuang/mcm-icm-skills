@@ -4,10 +4,20 @@ Semantic Scholar API 文献检索
 """
 
 import logging
-import time
+import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import requests
+# 添加common模块路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from common.api_utils import (
+    api_request_with_retry,
+    APIRequestError,
+    safe_get_nested,
+    safe_list_get,
+    DEFAULT_TIMEOUT,
+    DEFAULT_MAX_RETRIES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +70,16 @@ def search_papers(
     logger.info(f"Searching Semantic Scholar: {query}")
     
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            headers=headers if headers else None,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        data = response.json()
-        papers = data.get('data', [])
+        papers = data.get('data', []) if isinstance(data, dict) else []
         
         # 处理结果
         results = []
@@ -76,8 +91,11 @@ def search_papers(
         logger.info(f"Found {len(results)} papers")
         return results
         
-    except requests.exceptions.RequestException as e:
+    except APIRequestError as e:
         logger.error(f"Error searching Semantic Scholar: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error searching Semantic Scholar: {e}")
         return []
 
 
@@ -113,13 +131,22 @@ def get_paper_details(
         headers['x-api-key'] = api_key
         
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            headers=headers if headers else None,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        return process_paper(response.json())
+        return process_paper(data) if isinstance(data, dict) else None
         
-    except requests.exceptions.RequestException as e:
+    except APIRequestError as e:
         logger.error(f"Error getting paper details: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error getting paper details: {e}")
         return None
 
 
@@ -151,18 +178,29 @@ def get_paper_citations(
         headers['x-api-key'] = api_key
         
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            headers=headers if headers else None,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        data = response.json()
+        if not isinstance(data, dict):
+            return []
+            
         return [
             process_paper(item.get('citingPaper', {}))
             for item in data.get('data', [])
             if item.get('citingPaper')
         ]
         
-    except requests.exceptions.RequestException as e:
+    except APIRequestError as e:
         logger.error(f"Error getting citations: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error getting citations: {e}")
         return []
 
 
@@ -194,18 +232,29 @@ def get_paper_references(
         headers['x-api-key'] = api_key
         
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            headers=headers if headers else None,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        data = response.json()
+        if not isinstance(data, dict):
+            return []
+            
         return [
             process_paper(item.get('citedPaper', {}))
             for item in data.get('data', [])
             if item.get('citedPaper')
         ]
         
-    except requests.exceptions.RequestException as e:
+    except APIRequestError as e:
         logger.error(f"Error getting references: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error getting references: {e}")
         return []
 
 
@@ -222,36 +271,53 @@ def process_paper(paper: Dict) -> Optional[Dict]:
     if not paper or not paper.get('title'):
         return None
         
-    # 提取作者
+    # 提取作者（安全访问）
     authors = []
-    for author in paper.get('authors', []):
+    for author in paper.get('authors', []) or []:
         if isinstance(author, dict):
-            authors.append(author.get('name', ''))
+            name = author.get('name', '')
+            if name:
+                authors.append(name)
         elif isinstance(author, str):
             authors.append(author)
+    
+    # 如果没有作者，设置默认值
+    if not authors:
+        authors = ['Unknown']
             
-    # 提取DOI
-    external_ids = paper.get('externalIds', {}) or {}
+    # 提取DOI（安全访问）
+    external_ids = paper.get('externalIds') or {}
     doi = external_ids.get('DOI')
     arxiv_id = external_ids.get('ArXiv')
     
-    # 生成BibTeX key
-    first_author = authors[0].split()[-1] if authors else 'Unknown'
-    year = paper.get('year', 'XXXX')
-    title_word = paper.get('title', '').split()[0] if paper.get('title') else 'untitled'
-    bibtex_key = f"{first_author.lower()}{year}{title_word.lower()}"
+    # 生成BibTeX key（安全处理）
+    first_author_name = authors[0] if authors else 'Unknown'
+    first_author_parts = first_author_name.split()
+    first_author = first_author_parts[-1] if first_author_parts else 'unknown'
+    
+    year = paper.get('year') or 'XXXX'
+    
+    title = paper.get('title', '')
+    title_parts = title.split() if title else ['untitled']
+    title_word = title_parts[0] if title_parts else 'untitled'
+    
+    # 清理bibtex_key中的特殊字符
+    import re
+    clean_author = re.sub(r'[^\w]', '', first_author.lower())
+    clean_title = re.sub(r'[^\w]', '', title_word.lower())
+    bibtex_key = f"{clean_author}{year}{clean_title}"
     
     return {
         'paper_id': paper.get('paperId'),
-        'title': paper.get('title'),
+        'title': title,
         'authors': authors,
         'year': year,
-        'venue': paper.get('venue', ''),
-        'citation_count': paper.get('citationCount', 0),
-        'abstract': paper.get('abstract', ''),
+        'venue': paper.get('venue') or '',
+        'citation_count': paper.get('citationCount') or 0,
+        'abstract': paper.get('abstract') or '',
         'doi': doi,
         'arxiv_id': arxiv_id,
-        'url': paper.get('url', ''),
+        'url': paper.get('url') or '',
         'bibtex_key': bibtex_key
     }
 

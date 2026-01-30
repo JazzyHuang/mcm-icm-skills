@@ -4,11 +4,23 @@ World Bank API 数据获取
 """
 
 import logging
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
-import requests
+
+# 添加common模块路径
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+from common.api_utils import (
+    api_request_with_retry,
+    APIRequestError,
+    safe_get_nested,
+    safe_list_get,
+    DEFAULT_TIMEOUT,
+    DEFAULT_MAX_RETRIES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -90,17 +102,20 @@ def fetch_worldbank_data(
     logger.info(f"Fetching World Bank data: {indicator}")
     
     try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        
-        data = response.json()
+        # 使用带重试的API请求
+        data = api_request_with_retry(
+            url,
+            params=params,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
         # World Bank API返回格式: [metadata, data]
-        if len(data) < 2 or data[1] is None:
+        records = safe_list_get(data, 1)
+        if records is None or len(records) == 0:
             logger.warning(f"No data found for indicator: {indicator}")
             return pd.DataFrame()
-            
-        records = data[1]
         
         # 转换为DataFrame
         df = pd.DataFrame(records)
@@ -114,14 +129,18 @@ def fetch_worldbank_data(
             'indicator': 'indicator'
         }
         
-        # 提取嵌套字段
-        if 'country' in df.columns and isinstance(df['country'].iloc[0], dict):
-            df['country_name'] = df['country'].apply(lambda x: x.get('value', ''))
-            df['country_code'] = df['country'].apply(lambda x: x.get('id', ''))
+        # 提取嵌套字段（使用安全访问）
+        if 'country' in df.columns and len(df) > 0:
+            first_country = df['country'].iloc[0]
+            if isinstance(first_country, dict):
+                df['country_name'] = df['country'].apply(lambda x: x.get('value', '') if isinstance(x, dict) else '')
+                df['country_code'] = df['country'].apply(lambda x: x.get('id', '') if isinstance(x, dict) else '')
             
-        if 'indicator' in df.columns and isinstance(df['indicator'].iloc[0], dict):
-            df['indicator_name'] = df['indicator'].apply(lambda x: x.get('value', ''))
-            df['indicator_code'] = df['indicator'].apply(lambda x: x.get('id', ''))
+        if 'indicator' in df.columns and len(df) > 0:
+            first_indicator = df['indicator'].iloc[0]
+            if isinstance(first_indicator, dict):
+                df['indicator_name'] = df['indicator'].apply(lambda x: x.get('value', '') if isinstance(x, dict) else '')
+                df['indicator_code'] = df['indicator'].apply(lambda x: x.get('id', '') if isinstance(x, dict) else '')
             
         # 清理数据
         df['year'] = pd.to_numeric(df['date'], errors='coerce')
@@ -135,8 +154,11 @@ def fetch_worldbank_data(
         logger.info(f"Fetched {len(df)} records")
         return df
         
-    except requests.exceptions.RequestException as e:
+    except APIRequestError as e:
         logger.error(f"Error fetching World Bank data: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error fetching World Bank data: {e}")
         raise
 
 
@@ -197,33 +219,43 @@ def search_indicators(keyword: str, limit: int = 20) -> List[Dict]:
     }
     
     try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        data = response.json()
-        if len(data) < 2 or data[1] is None:
+        indicators_data = safe_list_get(data, 1)
+        if indicators_data is None:
             return []
             
         # 过滤包含关键词的指标
         keyword_lower = keyword.lower()
         results = []
         
-        for indicator in data[1]:
-            name = indicator.get('name', '').lower()
-            source_note = indicator.get('sourceNote', '').lower()
+        for indicator in indicators_data:
+            name = (indicator.get('name') or '').lower()
+            source_note = (indicator.get('sourceNote') or '').lower()
             
             if keyword_lower in name or keyword_lower in source_note:
+                source_value = safe_get_nested(indicator, 'source', 'value', default='')
+                note = indicator.get('sourceNote') or ''
                 results.append({
                     'id': indicator.get('id'),
                     'name': indicator.get('name'),
-                    'source': indicator.get('source', {}).get('value', ''),
-                    'note': indicator.get('sourceNote', '')[:200]
+                    'source': source_value,
+                    'note': note[:200] if note else ''
                 })
                 
         return results[:limit]
         
-    except Exception as e:
+    except APIRequestError as e:
         logger.error(f"Error searching indicators: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error searching indicators: {e}")
         return []
 
 
@@ -236,26 +268,34 @@ def get_country_list() -> List[Dict]:
     }
     
     try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
+        data = api_request_with_retry(
+            url,
+            params=params,
+            timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
+            return_json=True
+        )
         
-        data = response.json()
-        if len(data) < 2 or data[1] is None:
+        countries_data = safe_list_get(data, 1)
+        if countries_data is None:
             return []
             
         return [
             {
                 'id': c.get('id'),
                 'name': c.get('name'),
-                'region': c.get('region', {}).get('value', ''),
-                'income_level': c.get('incomeLevel', {}).get('value', '')
+                'region': safe_get_nested(c, 'region', 'value', default=''),
+                'income_level': safe_get_nested(c, 'incomeLevel', 'value', default='')
             }
-            for c in data[1]
-            if c.get('region', {}).get('id') != 'NA'  # 排除聚合区域
+            for c in countries_data
+            if safe_get_nested(c, 'region', 'id') != 'NA'  # 排除聚合区域
         ]
         
-    except Exception as e:
+    except APIRequestError as e:
         logger.error(f"Error fetching country list: {e}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error fetching country list: {e}")
         return []
 
 

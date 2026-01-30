@@ -111,8 +111,12 @@ class CitationDiversityValidator:
     def _load_config(self, config_path: str) -> ValidationConfig:
         """从文件加载配置"""
         try:
-            with open(config_path, 'r') as f:
+            with open(config_path, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
+            
+            if data is None:
+                logger.warning(f"Config file {config_path} is empty, using defaults")
+                return ValidationConfig()
             
             return ValidationConfig(
                 min_total_citations=data.get('validation_rules', {}).get('min_total_citations', 8),
@@ -122,8 +126,17 @@ class CitationDiversityValidator:
                 strict_mode=data.get('strict_mode', True),
                 category_requirements=data.get('category_requirements', ValidationConfig().category_requirements)
             )
+        except FileNotFoundError:
+            logger.warning(f"Config file not found: {config_path}, using defaults")
+            return ValidationConfig()
+        except yaml.YAMLError as e:
+            logger.warning(f"Invalid YAML in config file {config_path}: {e}, using defaults")
+            return ValidationConfig()
+        except (IOError, OSError) as e:
+            logger.warning(f"Failed to read config file {config_path}: {e}, using defaults")
+            return ValidationConfig()
         except Exception as e:
-            logger.warning(f"Failed to load config from {config_path}: {e}, using defaults")
+            logger.warning(f"Unexpected error loading config from {config_path}: {e}, using defaults")
             return ValidationConfig()
     
     def validate(self, citations: List[Dict[str, Any]]) -> Dict[str, Any]:

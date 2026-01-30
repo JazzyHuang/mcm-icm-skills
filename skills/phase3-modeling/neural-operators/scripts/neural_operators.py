@@ -172,8 +172,10 @@ class FNO2d(nn.Module):
                 optimizer.zero_grad()
                 y_pred = self.forward(X_batch)
                 
-                # 相对L2损失
-                loss = torch.mean((y_pred - y_batch) ** 2) / torch.mean(y_batch ** 2)
+                # 相对L2损失（添加数值稳定性保护）
+                y_batch_norm = torch.mean(y_batch ** 2)
+                eps = 1e-8  # 防止除零
+                loss = torch.mean((y_pred - y_batch) ** 2) / (y_batch_norm + eps)
                 loss.backward()
                 optimizer.step()
                 
@@ -196,6 +198,60 @@ class FNO2d(nn.Module):
             X = torch.tensor(X, dtype=torch.float32, device=self.device)
             y_pred = self.forward(X)
             return y_pred.cpu().numpy()
+    
+    def save_model(self, path: str):
+        """
+        保存完整模型
+        
+        Args:
+            path: 保存路径
+        """
+        checkpoint = {
+            'model_state_dict': self.state_dict(),
+            'config': {
+                'modes': self.modes,
+                'width': self.width,
+                'in_channels': self.in_channels,
+                'out_channels': self.out_channels,
+                'num_layers': self.num_layers,
+                'device': str(self.device)
+            },
+            'training_history': self.training_history
+        }
+        torch.save(checkpoint, path)
+        print(f"FNO model saved to {path}")
+    
+    @classmethod
+    def load_model(cls, path: str, device: str = 'auto') -> 'FNO':
+        """
+        加载模型
+        
+        Args:
+            path: 模型路径
+            device: 设备
+            
+        Returns:
+            加载的FNO模型
+        """
+        checkpoint = torch.load(path, map_location='cpu')
+        config = checkpoint['config']
+        
+        model = cls(
+            modes=config['modes'],
+            width=config['width'],
+            in_channels=config.get('in_channels', 1),
+            out_channels=config.get('out_channels', 1),
+            num_layers=config.get('num_layers', 4),
+            device=device
+        )
+        
+        model.load_state_dict(checkpoint['model_state_dict'])
+        
+        if 'training_history' in checkpoint:
+            model.training_history = checkpoint['training_history']
+        
+        print(f"FNO model loaded from {path}")
+        return model
 
 
 class DeepONet(nn.Module):

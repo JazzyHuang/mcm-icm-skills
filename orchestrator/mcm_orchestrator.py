@@ -260,26 +260,46 @@ class MCMOrchestrator:
     """
     层级式多智能体编排器
     基于AgentOrchestra架构设计
-    增强版: 包含质量门禁和阶段回退逻辑
+    增强版: 包含质量门禁和阶段回退逻辑、并发安全、依赖注入
     """
     
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(
+        self, 
+        config_path: Optional[str] = None,
+        state_manager: Optional[StateManager] = None,
+        error_handler: Optional[ErrorRecoveryManager] = None,
+        checkpoint_manager: Optional[CheckpointManager] = None,
+        quality_checker: Optional[QualityGateChecker] = None,
+        config: Optional[Dict] = None
+    ):
         """
-        初始化编排器
+        初始化编排器（支持依赖注入）
         
         Args:
             config_path: 配置文件路径，默认使用 config/settings.yaml
+            state_manager: 状态管理器实例（可选，用于依赖注入）
+            error_handler: 错误处理器实例（可选，用于依赖注入）
+            checkpoint_manager: 检查点管理器实例（可选，用于依赖注入）
+            quality_checker: 质量检查器实例（可选，用于依赖注入）
+            config: 配置字典（可选，优先于config_path）
         """
-        self.config = self._load_config(config_path)
-        self.state_manager = StateManager()
-        self.error_handler = ErrorRecoveryManager(self.config)
-        self.checkpoint_manager = CheckpointManager(
+        # 配置加载（支持直接传入配置字典）
+        self.config = config if config is not None else self._load_config(config_path)
+        
+        # 依赖注入：如果未提供则创建默认实例
+        self.state_manager = state_manager or StateManager()
+        self.error_handler = error_handler or ErrorRecoveryManager(self.config)
+        self.checkpoint_manager = checkpoint_manager or CheckpointManager(
             checkpoint_dir=Path(self.config.get('output', {}).get('checkpoint_dir', 'output/checkpoints'))
         )
-        self.quality_checker = QualityGateChecker()
+        self.quality_checker = quality_checker or QualityGateChecker()
+        
+        # 执行状态
         self.current_phase = 0
-        self.execution_log = []
-        self.fallback_count = {}  # 记录每个阶段的回退次数
+        self.execution_log: List[Dict[str, Any]] = []
+        self.fallback_count: Dict[int, int] = {}  # 记录每个阶段的回退次数
+        self._state_lock = asyncio.Lock()  # 状态更新锁，防止并发竞态
+        self._execution_id: Optional[str] = None  # 当前执行ID
         
     def _load_config(self, config_path: Optional[str] = None) -> Dict:
         """加载配置文件"""
@@ -543,31 +563,28 @@ class MCMOrchestrator:
             skill_groups = PARALLEL_SKILLS[phase]
             for group in skill_groups:
                 if len(group) > 1:
-                    # 并行执行
-                    group_results = await self._execute_parallel(
-                        [self._run_skill_with_retry(skill, state) for skill in group]
-                    )
-                    for skill, result in zip(group, group_results):
-                        if isinstance(result, Exception):
-                            logger.error(f"Skill {skill} failed with error: {result}")
-                            results[skill] = {'status': 'failed', 'error': str(result)}
-                        else:
-                            results[skill] = result
+                    # 并行执行（使用线程安全的方式）
+                    group_results = await self._execute_parallel_safe(group, state)
+                    for skill, result in group_results.items():
+                        results[skill] = result
                     # 并行组执行完成后更新 state，确保后续组可访问这些结果
-                    for skill in group:
-                        state.update({skill: results[skill]})
+                    async with self._state_lock:
+                        for skill in group:
+                            state.update({skill: results[skill]})
                 else:
                     # 单个执行
                     for skill in group:
                         results[skill] = await self._run_skill_with_retry(skill, state)
-                        state.update({skill: results[skill]})
+                        async with self._state_lock:
+                            state.update({skill: results[skill]})
         else:
             # 顺序执行
             for skill in skills:
                 try:
                     result = await self._run_skill_with_retry(skill, state)
                     results[skill] = result
-                    state.update({skill: result})
+                    async with self._state_lock:
+                        state.update({skill: result})
                 except Exception as e:
                     # 尝试备选方案
                     fallback = FALLBACK_SKILLS.get(skill)
@@ -582,9 +599,56 @@ class MCMOrchestrator:
                         raise
                         
         return results
+    
+    async def _execute_parallel_safe(self, skills: List[str], state: Dict) -> Dict[str, Any]:
+        """
+        并行执行多个技能（线程安全版本）
+        
+        每个技能使用state的深拷贝进行执行，完成后使用锁安全地合并结果
+        
+        Args:
+            skills: 要并行执行的技能列表
+            state: 当前状态
+            
+        Returns:
+            技能执行结果字典
+        """
+        from copy import deepcopy
+        
+        results = {}
+        
+        async def run_skill_safe(skill: str):
+            """安全执行单个技能"""
+            try:
+                # 为每个技能创建状态的深拷贝，避免并发修改
+                async with self._state_lock:
+                    local_state = deepcopy(state)
+                
+                result = await self._run_skill_with_retry(skill, local_state)
+                return skill, result, None
+            except Exception as e:
+                return skill, None, e
+        
+        # 并行执行所有技能
+        tasks = [run_skill_safe(skill) for skill in skills]
+        completed = await asyncio.gather(*tasks, return_exceptions=False)
+        
+        # 收集结果
+        for skill, result, error in completed:
+            if error is not None:
+                logger.error(f"Skill {skill} failed with error: {error}")
+                results[skill] = {'status': 'failed', 'error': str(error)}
+            else:
+                results[skill] = result
+        
+        return results
         
     async def _execute_parallel(self, coroutines: List) -> List:
-        """并行执行多个协程"""
+        """
+        并行执行多个协程
+        
+        注意：此方法保留用于向后兼容，但建议使用_execute_parallel_safe
+        """
         return await asyncio.gather(*coroutines, return_exceptions=True)
         
     async def _run_skill_with_retry(self, skill: str, state: Dict) -> Any:

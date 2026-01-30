@@ -419,8 +419,7 @@
       "government_reports",
       "official_data_sources",
       "problem_statement_references",
-      "technical_documentation",
-      "news_media"
+      "other_sources"
     ],
     "minimum_categories": 4,
     "academic_minimum": 3,
@@ -431,6 +430,13 @@
       "official_data_sources": 0.15,
       "problem_statement_references": 0.15,
       "other_sources": 0.15
+    },
+    "category_descriptions": {
+      "academic_papers": "同行评审学术论文、会议论文、预印本",
+      "government_reports": "政府/官方机构报告、白皮书",
+      "official_data_sources": "官方统计数据、数据库",
+      "problem_statement_references": "题目声明、题目附带数据",
+      "other_sources": "技术文档、新闻媒体、其他来源"
     },
     "diversity_score_threshold": 0.75,
     "required_sources": [

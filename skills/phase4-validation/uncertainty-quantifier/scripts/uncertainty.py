@@ -148,6 +148,7 @@ class ConformalPredictor:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.close(fig)  # 防止内存泄漏
         return fig
 
 

@@ -41,12 +41,14 @@ output:
   max_pages: 25
   min_font_size: 12
 
-# API速率限制
+# API速率限制 (每分钟请求数)
+# 详细配置请参考 shared_constants.yaml
 api_rate_limits:
-  semantic_scholar: 100  # 每分钟请求数
+  semantic_scholar: 20   # 官方: 100/5min = 20/min
   crossref: 50
   worldbank: 200
   arxiv: 30
+  openalex: 100
 
 # 数据源配置
 data_sources:

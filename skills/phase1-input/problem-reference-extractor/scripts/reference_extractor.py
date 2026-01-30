@@ -423,8 +423,12 @@ class ProblemReferenceExtractor:
             parts = domain.split('.')
             if len(parts) >= 2:
                 return parts[-2].capitalize()
-            return domain.capitalize()
-        except:
+            return domain.capitalize() if domain else "Web Source"
+        except (ValueError, AttributeError, IndexError) as e:
+            logger.debug(f"Failed to extract site name from URL {url}: {e}")
+            return "Web Source"
+        except Exception as e:
+            logger.warning(f"Unexpected error extracting site name from URL {url}: {e}")
             return "Web Source"
     
     def _extract_background_reports(self, text: str, year: int) -> None:

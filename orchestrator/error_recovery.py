@@ -145,6 +145,10 @@ class CriticalError(Exception):
 class ErrorRecoveryManager:
     """错误恢复管理器"""
     
+    # 全局最大重试次数限制，防止无限循环
+    MAX_GLOBAL_RETRIES = 10
+    MAX_PIPELINE_RESTARTS = 3
+    
     def __init__(self, config: Optional[Dict] = None):
         """
         初始化错误恢复管理器
@@ -155,6 +159,8 @@ class ErrorRecoveryManager:
         self.config = config or {}
         self.error_history = []
         self.recovery_attempts = {}
+        self._global_retry_count = 0  # 全局重试计数器
+        self._pipeline_restart_count = 0  # 流水线重启计数器
         
     def classify_error(self, error: Exception) -> ErrorCategory:
         """
@@ -291,6 +297,18 @@ class ErrorRecoveryManager:
         """处理重试策略"""
         error_key = f"{orchestrator.current_phase}_{type(error).__name__}"
         
+        # 增加全局重试计数器
+        self._global_retry_count += 1
+        
+        # 检查全局重试限制，防止无限循环
+        if self._global_retry_count > self.MAX_GLOBAL_RETRIES:
+            logger.error(f"Global retry limit ({self.MAX_GLOBAL_RETRIES}) exceeded, aborting")
+            return self.request_human_intervention(
+                error,
+                state,
+                message=f"全局重试次数超过限制({self.MAX_GLOBAL_RETRIES}次)，需要人工干预"
+            )
+        
         # 获取当前重试次数
         current_attempts = self.recovery_attempts.get(error_key, 0)
         
@@ -298,8 +316,18 @@ class ErrorRecoveryManager:
             self.recovery_attempts[error_key] = current_attempts + 1
             delay = self.calculate_backoff(current_attempts, config.backoff_type)
             
-            logger.info(f"Retrying after {delay}s (attempt {current_attempts + 1}/{config.max_retries})")
+            logger.info(f"Retrying after {delay}s (attempt {current_attempts + 1}/{config.max_retries}, global: {self._global_retry_count}/{self.MAX_GLOBAL_RETRIES})")
             await asyncio.sleep(delay)
+            
+            # 检查流水线重启次数限制
+            self._pipeline_restart_count += 1
+            if self._pipeline_restart_count > self.MAX_PIPELINE_RESTARTS:
+                logger.error(f"Pipeline restart limit ({self.MAX_PIPELINE_RESTARTS}) exceeded")
+                return self.request_human_intervention(
+                    error,
+                    state,
+                    message=f"流水线重启次数超过限制({self.MAX_PIPELINE_RESTARTS}次)，需要人工干预"
+                )
             
             # 从当前阶段重新执行
             return await orchestrator.execute_pipeline(
@@ -326,6 +354,16 @@ class ErrorRecoveryManager:
         
         if config.message:
             logger.info(config.message)
+        
+        # 检查流水线重启次数限制
+        self._pipeline_restart_count += 1
+        if self._pipeline_restart_count > self.MAX_PIPELINE_RESTARTS:
+            logger.error(f"Pipeline restart limit ({self.MAX_PIPELINE_RESTARTS}) exceeded during fallback")
+            return self.request_human_intervention(
+                error,
+                state,
+                message=f"流水线重启次数超过限制({self.MAX_PIPELINE_RESTARTS}次)，降级策略无法执行"
+            )
             
         # 标记使用了降级方案
         state['fallback_used'] = state.get('fallback_used', [])
@@ -428,3 +466,32 @@ class ErrorRecoveryManager:
             "从最近的检查点恢复执行",
             "手动修复问题后重新运行"
         ])
+    
+    def reset_counters(self) -> None:
+        """
+        重置所有计数器
+        
+        在开始新的流水线执行前调用此方法
+        """
+        self._global_retry_count = 0
+        self._pipeline_restart_count = 0
+        self.recovery_attempts = {}
+        logger.debug("Error recovery counters reset")
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """
+        获取错误恢复统计信息
+        
+        Returns:
+            统计信息字典
+        """
+        return {
+            'global_retry_count': self._global_retry_count,
+            'pipeline_restart_count': self._pipeline_restart_count,
+            'recovery_attempts': dict(self.recovery_attempts),
+            'error_history_count': len(self.error_history),
+            'limits': {
+                'max_global_retries': self.MAX_GLOBAL_RETRIES,
+                'max_pipeline_restarts': self.MAX_PIPELINE_RESTARTS
+            }
+        }

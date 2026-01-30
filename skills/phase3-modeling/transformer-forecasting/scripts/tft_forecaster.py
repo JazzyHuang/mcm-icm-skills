@@ -248,11 +248,29 @@ class TFTForecaster:
         return self.training_history
     
     def predict(self, data: pd.DataFrame, return_quantiles: bool = True):
-        """预测"""
+        """
+        预测
+        
+        Args:
+            data: 输入数据DataFrame
+            return_quantiles: 是否返回分位数预测
+            
+        Returns:
+            预测结果（分位数字典或点预测数组）
+        """
+        if self.model is None:
+            raise ValueError("Model not trained. Call fit() first.")
+        
         self.model.eval()
+        
+        # 使用与训练相同的数据准备方法处理输入数据
+        features = self.time_varying_unknown + self.time_varying_known
+        num_features = len(features) if features else 1
+        
+        # 准备输入数据（不需要y，使用滑动窗口创建序列）
+        X, _ = self._prepare_data(data, num_features)
+        
         with torch.no_grad():
-            X = torch.randn(len(data) if isinstance(data, pd.DataFrame) else 1, 
-                           self.max_encoder_length, 1).to(self.device)
             outputs, self.attention_weights = self.model(X)
             
             if return_quantiles:
@@ -264,15 +282,40 @@ class TFTForecaster:
             return outputs[..., 1].cpu().numpy()
     
     def variable_importance(self) -> Dict[str, float]:
-        """计算变量重要性"""
+        """
+        计算变量重要性
+        
+        基于注意力权重计算每个特征的重要性分数
+        """
         features = self.time_varying_unknown + self.time_varying_known
         if not features:
             features = ['target']
-            
-        # 简化实现
-        importance = {f: np.random.random() for f in features}
+        
+        # 如果有注意力权重，使用它们计算重要性
+        if self.attention_weights is not None:
+            try:
+                # 计算每个特征的平均注意力权重
+                attn = self.attention_weights.cpu().numpy()
+                # 对所有样本和时间步取平均
+                avg_attn = np.mean(np.abs(attn), axis=(0, 1))
+                
+                # 如果特征数量匹配
+                if len(avg_attn) >= len(features):
+                    importance = {f: float(avg_attn[i]) for i, f in enumerate(features)}
+                else:
+                    # 均匀分配
+                    importance = {f: 1.0 / len(features) for f in features}
+            except Exception:
+                # 出错时使用均匀分配
+                importance = {f: 1.0 / len(features) for f in features}
+        else:
+            # 没有注意力权重时，使用均匀分配（而不是随机值）
+            importance = {f: 1.0 / len(features) for f in features}
+        
+        # 归一化
         total = sum(importance.values())
-        importance = {k: v/total for k, v in importance.items()}
+        if total > 0:
+            importance = {k: v / total for k, v in importance.items()}
         
         self.variable_weights = importance
         return importance
@@ -302,7 +345,7 @@ class TFTForecaster:
         return fig
     
     def save_results(self, output_path: str):
-        """保存结果"""
+        """保存结果元数据（不包含模型权重）"""
         results = {
             'model': {
                 'type': 'TemporalFusionTransformer',
@@ -318,9 +361,87 @@ class TFTForecaster:
                 'variable_importance': self.variable_weights
             }
         }
-        with open(output_path, 'w') as f:
+        with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)
         return results
+    
+    def save_model(self, path: str):
+        """
+        保存完整模型（包含权重和配置）
+        
+        Args:
+            path: 保存路径（建议使用.pt或.pth后缀）
+        """
+        if self.model is None:
+            raise ValueError("No model to save. Call fit() first.")
+        
+        checkpoint = {
+            'model_state_dict': self.model.state_dict(),
+            'config': {
+                'max_encoder_length': self.max_encoder_length,
+                'max_prediction_length': self.max_prediction_length,
+                'time_varying_known': self.time_varying_known,
+                'time_varying_unknown': self.time_varying_unknown,
+                'static_categoricals': self.static_categoricals,
+                'hidden_dim': self.hidden_dim,
+                'num_heads': self.num_heads,
+                'num_layers': self.num_layers,
+                'dropout': self.dropout,
+                'quantiles': self.quantiles,
+                'device': str(self.device)
+            },
+            'training_history': self.training_history,
+            'variable_weights': self.variable_weights
+        }
+        torch.save(checkpoint, path)
+        print(f"Model saved to {path}")
+    
+    @classmethod
+    def load_model(cls, path: str, device: str = 'auto') -> 'TFTForecaster':
+        """
+        加载模型
+        
+        Args:
+            path: 模型路径
+            device: 设备（'auto', 'cpu', 'cuda'）
+            
+        Returns:
+            加载的TFTForecaster实例
+        """
+        checkpoint = torch.load(path, map_location='cpu')
+        config = checkpoint['config']
+        
+        # 创建实例
+        forecaster = cls(
+            max_encoder_length=config['max_encoder_length'],
+            max_prediction_length=config['max_prediction_length'],
+            time_varying_known=config.get('time_varying_known', []),
+            time_varying_unknown=config.get('time_varying_unknown', ['target']),
+            static_categoricals=config.get('static_categoricals', []),
+            hidden_dim=config.get('hidden_dim', 64),
+            num_heads=config.get('num_heads', 4),
+            num_layers=config.get('num_layers', 2),
+            dropout=config.get('dropout', 0.1),
+            quantiles=config.get('quantiles', [0.1, 0.5, 0.9]),
+            device=device
+        )
+        
+        # 构建模型架构
+        features = forecaster.time_varying_unknown + forecaster.time_varying_known
+        num_features = len(features) if features else 1
+        forecaster._build_model(num_features)
+        
+        # 加载权重
+        forecaster.model.load_state_dict(checkpoint['model_state_dict'])
+        
+        # 恢复训练历史和变量权重
+        if 'training_history' in checkpoint:
+            forecaster.training_history = checkpoint['training_history']
+        if 'variable_weights' in checkpoint:
+            forecaster.variable_weights = checkpoint['variable_weights']
+        
+        print(f"Model loaded from {path}")
+        return forecaster
 
 
 if __name__ == '__main__':

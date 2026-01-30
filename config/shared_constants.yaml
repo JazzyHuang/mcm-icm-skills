@@ -1,0 +1,90 @@
+# ===========================================
+# 共享常量配置
+# Shared Constants Configuration
+# ===========================================
+# 此文件包含在多处使用的配置值的唯一定义
+# 所有模块应引用此文件以确保一致性
+
+# 引用相关配置
+citation:
+  # 引用数量范围
+  min_total: 8
+  max_total: 15
+  
+  # 多样性要求
+  min_diversity_score: 0.75
+  min_categories: 4
+  
+  # 学术引用要求
+  min_academic_papers: 3
+  
+  # 时效性要求
+  recency_threshold_years: 5
+  recency_minimum_ratio: 0.5  # 50% 应在最近5年内
+
+# API速率限制（统一使用每分钟请求数）
+api_rate_limits:
+  semantic_scholar:
+    requests_per_minute: 20  # 官方限制: 100/5min = 20/min
+    description: "Semantic Scholar API"
+  
+  openalex:
+    requests_per_minute: 100  # 官方限制: ~10/sec, 保守使用
+    description: "OpenAlex API"
+  
+  arxiv:
+    requests_per_minute: 30  # 官方建议: 不超过3/sec
+    description: "arXiv API"
+  
+  crossref:
+    requests_per_minute: 50
+    description: "CrossRef API"
+  
+  worldbank:
+    requests_per_minute: 200
+    description: "World Bank API"
+  
+  google_scholar:
+    requests_per_minute: 10  # 非官方，保守使用
+    description: "Google Scholar (via scholarly)"
+
+# 论文结构要求
+paper_structure:
+  max_pages: 25
+  min_font_size: 12
+  
+  # 摘要要求
+  abstract:
+    min_words: 200
+    max_words: 350
+  
+  # 图表要求
+  figures:
+    min_count: 4
+    max_count: 15
+    recommended_count: 8
+  
+  tables:
+    min_count: 2
+    max_count: 10
+
+# 质量门禁阈值
+quality_gates:
+  # LAT评分阈值
+  lat_threshold:
+    description: "Language Accuracy and Tone - 语言准确度和语气"
+    minimum: 0.85
+  
+  # 创新性评分
+  innovation_threshold:
+    minimum: 0.7
+  
+  # 引用验证
+  citation_validity_threshold:
+    minimum: 0.95
+
+# 输出格式
+output:
+  figure_dpi: 300
+  figure_format: "pdf"
+  latex_compiler: "xelatex"

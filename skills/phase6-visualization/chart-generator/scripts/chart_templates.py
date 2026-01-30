@@ -196,8 +196,13 @@ class ChartTemplates:
         """气泡图"""
         fig, ax = plt.subplots(figsize=(10, 7))
         
-        # 归一化大小
-        size_normalized = (size - size.min()) / (size.max() - size.min()) * 1000 + 100
+        # 归一化大小（添加除零保护）
+        size_range = size.max() - size.min()
+        if size_range == 0 or np.isnan(size_range):
+            # 如果所有值相同，使用统一大小
+            size_normalized = np.ones_like(size) * 500
+        else:
+            size_normalized = (size - size.min()) / size_range * 1000 + 100
         
         scatter = ax.scatter(
             x, y,
@@ -212,7 +217,8 @@ class ChartTemplates:
         # 添加标签
         if labels:
             for i, label in enumerate(labels):
-                ax.annotate(label, (x[i], y[i]), fontsize=8, ha='center')
+                if i < len(x) and i < len(y):
+                    ax.annotate(label, (x[i], y[i]), fontsize=8, ha='center')
                 
         if color is not None:
             plt.colorbar(scatter, ax=ax)
@@ -224,6 +230,7 @@ class ChartTemplates:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.close(fig)  # 防止内存泄漏
         return fig
         
     def heatmap(self, data: np.ndarray, x_labels: List[str] = None,
@@ -262,11 +269,16 @@ class ChartTemplates:
         """平行坐标图"""
         fig, ax = plt.subplots(figsize=(12, 6))
         
-        # 标准化数据
+        # 标准化数据（添加除零保护）
         cols = [c for c in data.columns if c != class_column]
         data_norm = data.copy()
         for col in cols:
-            data_norm[col] = (data[col] - data[col].min()) / (data[col].max() - data[col].min())
+            col_range = data[col].max() - data[col].min()
+            if col_range == 0 or pd.isna(col_range):
+                # 如果所有值相同，设为0.5（中间值）
+                data_norm[col] = 0.5
+            else:
+                data_norm[col] = (data[col] - data[col].min()) / col_range
             
         # 绘制
         classes = data[class_column].unique()
@@ -290,6 +302,7 @@ class ChartTemplates:
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.close(fig)  # 防止内存泄漏
         return fig
         
     # ============ 趋势类图表 ============

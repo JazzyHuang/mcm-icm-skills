@@ -4,6 +4,8 @@
 # ===========================================
 
 # 学术数据源
+# 注意: rate_limit_per_minute 统一使用每分钟请求数
+# 详细配置请参考 shared_constants.yaml
 academic_sources:
   semantic_scholar:
     enabled: true
@@ -11,7 +13,7 @@ academic_sources:
     priority: 1
     base_url: "https://api.semanticscholar.org/graph/v1"
     description: "AI驱动的学术搜索，提供引用关系"
-    rate_limit: 100  # requests per 5 minutes
+    rate_limit_per_minute: 20  # 官方: 100/5min = 20/min
     
   openalex:
     enabled: true
@@ -19,7 +21,7 @@ academic_sources:
     priority: 2
     base_url: "https://api.openalex.org"
     description: "免费开放API，240M+学术文献"
-    rate_limit: 10  # requests per second
+    rate_limit_per_minute: 100  # 官方: ~10/sec, 保守使用
     
   arxiv:
     enabled: true
@@ -27,7 +29,7 @@ academic_sources:
     priority: 3
     base_url: "http://export.arxiv.org/api"
     description: "预印本库，最新研究"
-    rate_limit: 3  # requests per second
+    rate_limit_per_minute: 30  # 官方: 不超过3/sec
     
   crossref:
     enabled: true

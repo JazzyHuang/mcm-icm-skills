@@ -63,8 +63,9 @@ def run_sobol_analysis(
             
     # 移除NaN
     valid_mask = ~np.isnan(Y)
-    if not all(valid_mask):
-        logger.warning(f"Removed {sum(~valid_mask)} invalid samples")
+    if not valid_mask.all():  # 修复: 使用numpy的all()方法
+        invalid_count = np.sum(~valid_mask)
+        logger.warning(f"Removed {invalid_count} invalid samples")
         samples = samples[valid_mask]
         Y = Y[valid_mask]
         
