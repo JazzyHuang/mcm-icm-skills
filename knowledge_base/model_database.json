@@ -9,7 +9,8 @@
           "python_library": "statsmodels",
           "complexity": "O(n)",
           "pros": ["经典方法", "可解释性强", "低数据需求"],
-          "cons": ["需要平稳性", "难以捕捉复杂模式"]
+          "cons": ["需要平稳性", "难以捕捉复杂模式"],
+          "innovation_score": 0.3
         },
         "Prophet": {
           "full_name": "Facebook Prophet",
@@ -18,16 +19,39 @@
           "python_library": "prophet",
           "complexity": "O(n)",
           "pros": ["自动处理节假日", "鲁棒性强", "可解释"],
-          "cons": ["不适合高频数据", "大规模数据慢"]
+          "cons": ["不适合高频数据", "大规模数据慢"],
+          "innovation_score": 0.5
         },
         "LSTM": {
           "full_name": "Long Short-Term Memory",
           "use_case": "复杂序列模式学习",
           "requirements": ["大量训练数据", "GPU推荐"],
-          "python_library": "tensorflow/pytorch",
+          "python_library": "pytorch",
           "complexity": "O(n·d²)",
           "pros": ["捕捉长期依赖", "非线性建模"],
-          "cons": ["黑盒", "需要大量数据", "训练慢"]
+          "cons": ["黑盒", "需要大量数据", "训练慢"],
+          "innovation_score": 0.6
+        },
+        "Transformer": {
+          "full_name": "Temporal Fusion Transformer",
+          "use_case": "多变量多步时间序列预测",
+          "requirements": ["大量训练数据", "GPU推荐"],
+          "python_library": "pytorch-forecasting",
+          "complexity": "O(n·d²)",
+          "pros": ["可解释注意力机制", "多输入类型支持", "多步预测", "捕捉长期依赖"],
+          "cons": ["计算资源需求高", "需要大量数据", "调参复杂"],
+          "variants": ["TFT", "Informer", "Autoformer", "PatchTST"],
+          "innovation_score": 0.9
+        },
+        "NBeats": {
+          "full_name": "Neural Basis Expansion Analysis for Time Series",
+          "use_case": "纯神经网络时间序列预测",
+          "requirements": ["中等规模数据"],
+          "python_library": "pytorch-forecasting",
+          "complexity": "O(n·d)",
+          "pros": ["无需特征工程", "可解释的趋势/季节分解"],
+          "cons": ["仅支持单变量"],
+          "innovation_score": 0.85
         }
       },
       "regression": {
@@ -37,7 +61,8 @@
           "python_library": "sklearn",
           "complexity": "O(n·d²)",
           "pros": ["简单可解释", "快速"],
-          "cons": ["只能建模线性关系"]
+          "cons": ["只能建模线性关系"],
+          "innovation_score": 0.2
         },
         "RandomForest": {
           "full_name": "Random Forest Regressor",
@@ -45,7 +70,8 @@
           "python_library": "sklearn",
           "complexity": "O(n·m·log(n))",
           "pros": ["抗过拟合", "特征重要性", "无需标准化"],
-          "cons": ["内存消耗大", "预测速度慢"]
+          "cons": ["内存消耗大", "预测速度慢"],
+          "innovation_score": 0.5
         },
         "XGBoost": {
           "full_name": "Extreme Gradient Boosting",
@@ -53,8 +79,283 @@
           "python_library": "xgboost",
           "complexity": "O(n·d·log(n))",
           "pros": ["高精度", "可处理缺失值", "正则化"],
-          "cons": ["参数调优复杂", "过拟合风险"]
+          "cons": ["参数调优复杂", "过拟合风险"],
+          "innovation_score": 0.6
+        },
+        "LightGBM": {
+          "full_name": "Light Gradient Boosting Machine",
+          "use_case": "大规模数据高效回归",
+          "python_library": "lightgbm",
+          "complexity": "O(n·d)",
+          "pros": ["训练速度快", "内存效率高", "支持类别特征"],
+          "cons": ["小数据集易过拟合"],
+          "innovation_score": 0.65
+        },
+        "CatBoost": {
+          "full_name": "Categorical Boosting",
+          "use_case": "类别特征丰富的回归",
+          "python_library": "catboost",
+          "complexity": "O(n·d·log(n))",
+          "pros": ["原生类别特征支持", "鲁棒性强"],
+          "cons": ["训练时间较长"],
+          "innovation_score": 0.65
         }
+      }
+    },
+    "deep_learning": {
+      "GNN": {
+        "full_name": "Graph Neural Network",
+        "use_case": "图结构数据建模（交通、社交网络、分子结构）",
+        "requirements": ["图结构数据", "GPU推荐"],
+        "python_library": "torch_geometric",
+        "complexity": "O(V·d² + E·d)",
+        "pros": ["捕捉图结构信息", "适合关系数据", "可扩展"],
+        "cons": ["需要图结构", "计算复杂度高"],
+        "variants": {
+          "GCN": {"use_case": "节点分类、图分类"},
+          "GAT": {"use_case": "需要节点重要性区分的场景"},
+          "GraphSAGE": {"use_case": "大规模图、归纳学习"}
+        },
+        "innovation_score": 0.95,
+        "problem_types": ["B", "D"]
+      },
+      "CNN": {
+        "full_name": "Convolutional Neural Network",
+        "use_case": "图像数据、空间数据分析",
+        "requirements": ["图像/网格数据", "GPU推荐"],
+        "python_library": "pytorch",
+        "complexity": "O(n·k²·c)",
+        "pros": ["空间特征提取", "平移不变性", "参数共享"],
+        "cons": ["需要大量数据", "黑盒"],
+        "variants": ["ResNet", "VGG", "EfficientNet"],
+        "innovation_score": 0.7
+      },
+      "VAE": {
+        "full_name": "Variational Autoencoder",
+        "use_case": "数据生成、异常检测、降维",
+        "requirements": ["中等规模数据", "GPU推荐"],
+        "python_library": "pytorch",
+        "complexity": "O(n·d²)",
+        "pros": ["生成能力", "隐空间可解释", "不确定性量化"],
+        "cons": ["生成质量有限", "训练不稳定"],
+        "innovation_score": 0.8
+      },
+      "GAN": {
+        "full_name": "Generative Adversarial Network",
+        "use_case": "数据增强、图像生成",
+        "requirements": ["大量训练数据", "GPU必需"],
+        "python_library": "pytorch",
+        "complexity": "O(n·d²)",
+        "pros": ["高质量生成", "无需显式密度估计"],
+        "cons": ["训练不稳定", "模式崩塌"],
+        "variants": ["DCGAN", "WGAN", "StyleGAN"],
+        "innovation_score": 0.85
+      },
+      "KAN": {
+        "full_name": "Kolmogorov-Arnold Network",
+        "use_case": "PDE求解、符号回归、物理定律发现",
+        "requirements": ["GPU推荐"],
+        "python_library": "pykan",
+        "complexity": "O(n·d)",
+        "pros": ["参数效率高100倍", "可解释性强", "更快的神经缩放定律"],
+        "cons": ["训练速度较慢", "较新方法"],
+        "innovation_score": 0.98,
+        "problem_types": ["A", "C"]
+      }
+    },
+    "physics_informed": {
+      "PINN": {
+        "full_name": "Physics-Informed Neural Network",
+        "use_case": "PDE/ODE求解、物理约束建模",
+        "requirements": ["物理方程", "边界条件", "GPU推荐"],
+        "python_library": "deepxde",
+        "complexity": "O(n·d²)",
+        "pros": ["融合物理先验", "小数据有效", "保证物理一致性"],
+        "cons": ["训练困难", "需要物理知识", "收敛慢"],
+        "supported_equations": ["热传导方程", "波动方程", "Navier-Stokes", "扩散方程", "Burgers方程"],
+        "innovation_score": 0.95,
+        "problem_types": ["A"]
+      },
+      "FNO": {
+        "full_name": "Fourier Neural Operator",
+        "use_case": "分辨率无关的PDE求解",
+        "requirements": ["规则网格数据", "GPU推荐"],
+        "python_library": "neuraloperator",
+        "complexity": "O(n·log(n))",
+        "pros": ["分辨率无关", "快速推理", "1000倍加速"],
+        "cons": ["需要规则网格"],
+        "innovation_score": 0.96,
+        "problem_types": ["A"]
+      },
+      "DeepONet": {
+        "full_name": "Deep Operator Network",
+        "use_case": "算子学习、参数化PDE",
+        "requirements": ["输入输出函数对", "GPU推荐"],
+        "python_library": "deepxde",
+        "complexity": "O(n·d²)",
+        "pros": ["学习算子映射", "泛化到新参数", "灵活处理非均匀观测"],
+        "cons": ["需要大量训练数据"],
+        "innovation_score": 0.92,
+        "problem_types": ["A"]
+      }
+    },
+    "reinforcement_learning": {
+      "DQN": {
+        "full_name": "Deep Q-Network",
+        "use_case": "离散动作空间的序列决策",
+        "requirements": ["环境模拟器", "GPU推荐"],
+        "python_library": "stable-baselines3",
+        "complexity": "取决于网络结构",
+        "pros": ["离散动作处理好", "经验回放稳定训练"],
+        "cons": ["不能处理连续动作", "过估计问题"],
+        "variants": ["Double DQN", "Dueling DQN", "Rainbow"],
+        "innovation_score": 0.85,
+        "problem_types": ["B", "D"]
+      },
+      "PPO": {
+        "full_name": "Proximal Policy Optimization",
+        "use_case": "连续动作空间的策略优化",
+        "requirements": ["环境模拟器", "GPU推荐"],
+        "python_library": "stable-baselines3",
+        "complexity": "取决于网络结构",
+        "pros": ["稳定训练", "支持连续动作", "易于调参"],
+        "cons": ["样本效率中等"],
+        "innovation_score": 0.88,
+        "problem_types": ["B", "D", "F"]
+      },
+      "SAC": {
+        "full_name": "Soft Actor-Critic",
+        "use_case": "连续控制、机器人",
+        "requirements": ["连续动作空间", "GPU推荐"],
+        "python_library": "stable-baselines3",
+        "complexity": "取决于网络结构",
+        "pros": ["样本效率高", "探索能力强", "稳定"],
+        "cons": ["仅支持连续动作"],
+        "innovation_score": 0.9
+      },
+      "MARL": {
+        "full_name": "Multi-Agent Reinforcement Learning",
+        "use_case": "多智能体博弈、协作",
+        "requirements": ["多智能体环境", "GPU推荐"],
+        "python_library": "pettingzoo",
+        "complexity": "O(n²)随智能体数量",
+        "pros": ["建模交互", "博弈均衡"],
+        "cons": ["训练不稳定", "复杂度高"],
+        "variants": ["MADDPG", "QMIX", "MAPPO"],
+        "innovation_score": 0.92,
+        "problem_types": ["F"]
+      }
+    },
+    "causal_inference": {
+      "DoubleMachineLearning": {
+        "full_name": "Double Machine Learning",
+        "use_case": "处理效应估计、因果推断",
+        "requirements": ["观测数据", "处理变量"],
+        "python_library": "econml",
+        "complexity": "O(n·d)",
+        "pros": ["去偏估计", "使用任意ML模型", "有理论保证"],
+        "cons": ["需要无混杂假设"],
+        "innovation_score": 0.9,
+        "problem_types": ["E", "F"]
+      },
+      "InstrumentalVariables": {
+        "full_name": "Instrumental Variables",
+        "use_case": "内生性问题处理",
+        "requirements": ["有效工具变量"],
+        "python_library": "linearmodels",
+        "complexity": "O(n·d²)",
+        "pros": ["处理内生性", "一致估计"],
+        "cons": ["需要找到有效工具"],
+        "innovation_score": 0.75,
+        "problem_types": ["E", "F"]
+      },
+      "DifferenceInDifferences": {
+        "full_name": "Difference-in-Differences",
+        "use_case": "政策效果评估",
+        "requirements": ["面板数据", "处理组和对照组"],
+        "python_library": "causalimpact",
+        "complexity": "O(n·d)",
+        "pros": ["直观", "控制时间趋势"],
+        "cons": ["平行趋势假设"],
+        "innovation_score": 0.8,
+        "problem_types": ["E", "F"]
+      },
+      "CausalForest": {
+        "full_name": "Causal Forest",
+        "use_case": "异质性处理效应",
+        "requirements": ["观测数据", "处理变量"],
+        "python_library": "econml",
+        "complexity": "O(n·m·log(n))",
+        "pros": ["发现异质效应", "非参数"],
+        "cons": ["解释性较低"],
+        "innovation_score": 0.88,
+        "problem_types": ["E", "F"]
+      }
+    },
+    "explainability": {
+      "SHAP": {
+        "full_name": "SHapley Additive exPlanations",
+        "use_case": "模型解释、特征重要性",
+        "requirements": ["已训练模型"],
+        "python_library": "shap",
+        "complexity": "O(2^n) 或 O(n·m) (近似)",
+        "pros": ["理论基础扎实", "全局和局部解释", "模型无关"],
+        "cons": ["计算复杂"],
+        "output_types": ["summary_plot", "force_plot", "dependence_plot", "waterfall_plot"],
+        "innovation_score": 0.85
+      },
+      "LIME": {
+        "full_name": "Local Interpretable Model-agnostic Explanations",
+        "use_case": "单个预测解释",
+        "requirements": ["已训练模型"],
+        "python_library": "lime",
+        "complexity": "O(n·d)",
+        "pros": ["直观", "模型无关", "快速"],
+        "cons": ["仅局部解释", "不稳定"],
+        "innovation_score": 0.8
+      },
+      "IntegratedGradients": {
+        "full_name": "Integrated Gradients",
+        "use_case": "深度学习模型解释",
+        "requirements": ["可微分模型"],
+        "python_library": "captum",
+        "complexity": "O(n·d)",
+        "pros": ["理论保证", "适合神经网络"],
+        "cons": ["仅适用可微分模型"],
+        "innovation_score": 0.82
+      }
+    },
+    "uncertainty_quantification": {
+      "ConformalPrediction": {
+        "full_name": "Conformal Prediction",
+        "use_case": "分布无关的不确定性量化",
+        "requirements": ["校准数据集"],
+        "python_library": "mapie",
+        "complexity": "O(n)",
+        "pros": ["分布无关保证", "任意模型适用", "有效覆盖率"],
+        "cons": ["预测集可能过大"],
+        "innovation_score": 0.92,
+        "variants": ["Split Conformal", "CV+", "Jackknife+"]
+      },
+      "BayesianNeuralNetwork": {
+        "full_name": "Bayesian Neural Network",
+        "use_case": "不确定性量化、小数据学习",
+        "requirements": ["GPU推荐"],
+        "python_library": "pytorch",
+        "complexity": "O(n·d²)",
+        "pros": ["不确定性估计", "防止过拟合"],
+        "cons": ["计算成本高", "近似推断"],
+        "innovation_score": 0.88
+      },
+      "MCDropout": {
+        "full_name": "Monte Carlo Dropout",
+        "use_case": "简单不确定性估计",
+        "requirements": ["Dropout层"],
+        "python_library": "pytorch",
+        "complexity": "O(n·d·T)",
+        "pros": ["简单实现", "无需修改架构"],
+        "cons": ["近似质量有限"],
+        "innovation_score": 0.75
       }
     },
     "optimization": {
@@ -62,46 +363,132 @@
         "LinearProgramming": {
           "full_name": "Linear Programming",
           "use_case": "线性约束下的线性目标优化",
-          "python_library": "scipy.optimize.linprog, pulp",
+          "python_library": "scipy, pulp",
           "complexity": "O(n³)",
           "pros": ["全局最优保证", "高效求解"],
-          "cons": ["只能处理线性问题"]
+          "cons": ["只能处理线性问题"],
+          "innovation_score": 0.3
         },
         "MILP": {
           "full_name": "Mixed Integer Linear Programming",
           "use_case": "含整数变量的线性优化",
-          "python_library": "pulp, gurobi, ortools",
+          "python_library": "pulp, gurobi",
           "complexity": "NP-hard",
           "pros": ["可建模离散选择", "工业标准"],
-          "cons": ["大规模问题难解", "可能需要商业求解器"]
+          "cons": ["大规模问题难解"],
+          "innovation_score": 0.5
         }
       },
       "nonlinear": {
         "SQP": {
           "full_name": "Sequential Quadratic Programming",
           "use_case": "非线性约束优化",
-          "python_library": "scipy.optimize.minimize",
+          "python_library": "scipy.optimize",
           "complexity": "O(n³)",
           "pros": ["可处理非线性约束", "收敛快"],
-          "cons": ["可能陷入局部最优", "需要初始点"]
+          "cons": ["可能陷入局部最优"],
+          "innovation_score": 0.5
         },
+        "InteriorPoint": {
+          "full_name": "Interior Point Method",
+          "use_case": "大规模凸优化",
+          "python_library": "cvxpy",
+          "complexity": "O(n³)",
+          "pros": ["多项式时间", "大规模问题高效"],
+          "cons": ["仅凸问题"],
+          "innovation_score": 0.6
+        }
+      },
+      "metaheuristics": {
         "GeneticAlgorithm": {
           "full_name": "Genetic Algorithm",
           "use_case": "全局优化，复杂搜索空间",
           "python_library": "deap, pymoo",
           "complexity": "取决于参数设置",
           "pros": ["全局搜索", "可处理离散和连续变量"],
-          "cons": ["收敛慢", "参数敏感"]
+          "cons": ["收敛慢", "参数敏感"],
+          "innovation_score": 0.6
+        },
+        "PSO": {
+          "full_name": "Particle Swarm Optimization",
+          "use_case": "连续非凸优化",
+          "python_library": "pyswarm, pymoo",
+          "complexity": "O(n·p·iter)",
+          "pros": ["简单实现", "全局搜索", "无需梯度"],
+          "cons": ["收敛慢", "易早熟"],
+          "innovation_score": 0.7,
+          "problem_types": ["A", "D"]
+        },
+        "SimulatedAnnealing": {
+          "full_name": "Simulated Annealing",
+          "use_case": "组合优化",
+          "python_library": "simanneal",
+          "complexity": "O(iter)",
+          "pros": ["简单", "可跳出局部最优"],
+          "cons": ["参数敏感", "收敛慢"],
+          "innovation_score": 0.65,
+          "problem_types": ["B", "D"]
+        },
+        "ACO": {
+          "full_name": "Ant Colony Optimization",
+          "use_case": "TSP、VRP等路径问题",
+          "python_library": "pants",
+          "complexity": "O(n²·m·iter)",
+          "pros": ["适合路径问题", "分布式"],
+          "cons": ["收敛慢", "参数多"],
+          "innovation_score": 0.7,
+          "problem_types": ["B", "D"]
+        },
+        "DifferentialEvolution": {
+          "full_name": "Differential Evolution",
+          "use_case": "实数优化",
+          "python_library": "scipy.optimize",
+          "complexity": "O(n·p·iter)",
+          "pros": ["无需梯度", "鲁棒"],
+          "cons": ["高维问题效率低"],
+          "innovation_score": 0.7
         }
       },
       "multi_objective": {
         "NSGA-II": {
           "full_name": "Non-dominated Sorting Genetic Algorithm II",
-          "use_case": "多目标优化",
-          "python_library": "pymoo, deap",
+          "use_case": "多目标优化（2-3目标）",
+          "python_library": "pymoo",
           "complexity": "O(M·N²)",
           "pros": ["生成Pareto前沿", "保持解的多样性"],
-          "cons": ["计算量大", "参数调优"]
+          "cons": ["计算量大"],
+          "innovation_score": 0.75
+        },
+        "NSGA-III": {
+          "full_name": "Non-dominated Sorting Genetic Algorithm III",
+          "use_case": "多目标优化（3+目标）",
+          "python_library": "pymoo",
+          "complexity": "O(M·N²)",
+          "pros": ["高维目标空间", "参考点导向", "理论保证(2025)"],
+          "cons": ["参考点选择复杂"],
+          "innovation_score": 0.92,
+          "problem_types": ["E"]
+        },
+        "MOEAD": {
+          "full_name": "Multi-Objective Evolutionary Algorithm based on Decomposition",
+          "use_case": "大规模多目标优化",
+          "python_library": "pymoo",
+          "complexity": "O(M·N·T)",
+          "pros": ["分解策略", "计算高效", "可扩展"],
+          "cons": ["权重向量设计"],
+          "innovation_score": 0.88,
+          "problem_types": ["E"]
+        }
+      },
+      "bayesian": {
+        "BayesianOptimization": {
+          "full_name": "Bayesian Optimization",
+          "use_case": "昂贵目标函数优化、超参数调优",
+          "python_library": "optuna, scikit-optimize",
+          "complexity": "O(n³) per iteration",
+          "pros": ["样本效率高", "处理噪声", "适合昂贵函数"],
+          "cons": ["高维效果差"],
+          "innovation_score": 0.85
         }
       }
     },
@@ -111,21 +498,48 @@
         "use_case": "多准则决策，专家判断",
         "python_library": "pyahp",
         "pros": ["结构化", "融入专家经验"],
-        "cons": ["主观性强", "一致性检验"]
+        "cons": ["主观性强", "一致性检验"],
+        "innovation_score": 0.4
       },
       "TOPSIS": {
         "full_name": "Technique for Order Preference by Similarity to Ideal Solution",
         "use_case": "多属性决策排序",
         "python_library": "topsis",
         "pros": ["客观", "易于实现"],
-        "cons": ["权重确定主观", "对极值敏感"]
+        "cons": ["权重确定主观"],
+        "innovation_score": 0.5
       },
       "DEA": {
         "full_name": "Data Envelopment Analysis",
         "use_case": "效率评估",
         "python_library": "pyDEA",
         "pros": ["无需假设函数形式", "多输入多输出"],
-        "cons": ["对异常值敏感", "不能外推"]
+        "cons": ["对异常值敏感"],
+        "innovation_score": 0.6
+      },
+      "ELECTRE": {
+        "full_name": "Elimination and Choice Expressing Reality",
+        "use_case": "多准则决策（有阈值）",
+        "python_library": "pymcdm",
+        "pros": ["处理不可比性", "阈值灵活"],
+        "cons": ["复杂", "参数多"],
+        "innovation_score": 0.7
+      },
+      "PROMETHEE": {
+        "full_name": "Preference Ranking Organization Method",
+        "use_case": "多准则决策排序",
+        "python_library": "pymcdm",
+        "pros": ["偏好函数灵活", "可视化好"],
+        "cons": ["参数设置"],
+        "innovation_score": 0.72
+      },
+      "GreyRelationalAnalysis": {
+        "full_name": "Grey Relational Analysis",
+        "use_case": "不确定性决策",
+        "python_library": "greytheory",
+        "pros": ["小样本有效", "处理不确定性"],
+        "cons": ["解释性差"],
+        "innovation_score": 0.68
       }
     },
     "network": {
@@ -135,7 +549,8 @@
         "python_library": "networkx",
         "complexity": "O((V+E)logV)",
         "pros": ["最优保证", "高效"],
-        "cons": ["不能处理负权边"]
+        "cons": ["不能处理负权边"],
+        "innovation_score": 0.3
       },
       "MaxFlow": {
         "full_name": "Maximum Flow Algorithm",
@@ -143,7 +558,8 @@
         "python_library": "networkx",
         "complexity": "O(VE²)",
         "pros": ["精确解"],
-        "cons": ["不能处理动态网络"]
+        "cons": ["不能处理动态网络"],
+        "innovation_score": 0.4
       },
       "Louvain": {
         "full_name": "Louvain Community Detection",
@@ -151,7 +567,27 @@
         "python_library": "python-louvain",
         "complexity": "O(n·log(n))",
         "pros": ["快速", "模块度优化"],
-        "cons": ["分辨率限制"]
+        "cons": ["分辨率限制"],
+        "innovation_score": 0.6
+      },
+      "PageRank": {
+        "full_name": "PageRank Algorithm",
+        "use_case": "节点重要性排序",
+        "python_library": "networkx",
+        "complexity": "O(V + E)",
+        "pros": ["简单", "有效"],
+        "cons": ["需要迭代收敛"],
+        "innovation_score": 0.5
+      },
+      "MinCostFlow": {
+        "full_name": "Minimum Cost Flow",
+        "use_case": "最小费用最大流",
+        "python_library": "networkx, ortools",
+        "complexity": "O(V²E·log(V))",
+        "pros": ["同时优化流量和成本"],
+        "cons": ["问题规模限制"],
+        "innovation_score": 0.55,
+        "problem_types": ["D"]
       }
     },
     "simulation": {
@@ -161,30 +597,231 @@
         "python_library": "numpy",
         "complexity": "O(n)",
         "pros": ["灵活", "易实现"],
-        "cons": ["需要大量样本", "慢"]
+        "cons": ["需要大量样本", "慢"],
+        "innovation_score": 0.5
       },
       "SystemDynamics": {
         "full_name": "System Dynamics",
         "use_case": "系统行为建模",
         "python_library": "pysd",
         "pros": ["反馈机制建模", "政策分析"],
-        "cons": ["参数估计难", "简化假设"]
+        "cons": ["参数估计难"],
+        "innovation_score": 0.65
       },
       "ABM": {
         "full_name": "Agent-Based Model",
         "use_case": "个体行为模拟",
         "python_library": "mesa",
         "pros": ["异质性建模", "涌现行为"],
-        "cons": ["计算量大", "验证困难"]
+        "cons": ["计算量大", "验证困难"],
+        "innovation_score": 0.85,
+        "problem_types": ["F"]
+      },
+      "DiscreteEventSimulation": {
+        "full_name": "Discrete Event Simulation",
+        "use_case": "排队系统、生产调度",
+        "python_library": "simpy",
+        "complexity": "O(n·log(n))",
+        "pros": ["精确建模事件", "适合排队"],
+        "cons": ["建模复杂"],
+        "innovation_score": 0.7,
+        "problem_types": ["D"]
+      },
+      "CellularAutomata": {
+        "full_name": "Cellular Automata",
+        "use_case": "空间演化、传播模型",
+        "python_library": "cellpylib",
+        "complexity": "O(n²·t)",
+        "pros": ["空间动态", "简单规则复杂行为"],
+        "cons": ["规则设计"],
+        "innovation_score": 0.75
+      }
+    },
+    "game_theory": {
+      "NashEquilibrium": {
+        "full_name": "Nash Equilibrium",
+        "use_case": "非合作博弈分析",
+        "python_library": "nashpy",
+        "complexity": "PPAD-complete",
+        "pros": ["博弈均衡分析", "经典理论"],
+        "cons": ["计算困难", "多均衡"],
+        "innovation_score": 0.6,
+        "problem_types": ["F"]
+      },
+      "EvolutionaryGameTheory": {
+        "full_name": "Evolutionary Game Theory",
+        "use_case": "策略演化、种群动态",
+        "python_library": "axelrod",
+        "complexity": "O(n²·t)",
+        "pros": ["动态分析", "无需理性假设"],
+        "cons": ["参数敏感"],
+        "innovation_score": 0.82,
+        "problem_types": ["F"]
+      },
+      "StackelbergGame": {
+        "full_name": "Stackelberg Game",
+        "use_case": "领导者-追随者博弈",
+        "python_library": "cvxpy",
+        "pros": ["建模层级决策"],
+        "cons": ["求解复杂"],
+        "innovation_score": 0.8,
+        "problem_types": ["F"]
+      }
+    },
+    "clustering": {
+      "KMeans": {
+        "full_name": "K-Means Clustering",
+        "use_case": "数据分组",
+        "python_library": "sklearn",
+        "complexity": "O(n·k·d·iter)",
+        "pros": ["简单", "快速", "可扩展"],
+        "cons": ["需指定k", "对初始化敏感"],
+        "innovation_score": 0.3
+      },
+      "DBSCAN": {
+        "full_name": "Density-Based Spatial Clustering",
+        "use_case": "发现任意形状簇",
+        "python_library": "sklearn",
+        "complexity": "O(n·log(n))",
+        "pros": ["无需指定k", "发现噪声"],
+        "cons": ["参数敏感", "高维效果差"],
+        "innovation_score": 0.5
+      },
+      "HierarchicalClustering": {
+        "full_name": "Hierarchical Clustering",
+        "use_case": "层级分组结构",
+        "python_library": "sklearn",
+        "complexity": "O(n²·log(n))",
+        "pros": ["可视化树状图", "无需指定k"],
+        "cons": ["计算慢", "不可逆"],
+        "innovation_score": 0.45
+      },
+      "GaussianMixture": {
+        "full_name": "Gaussian Mixture Model",
+        "use_case": "软聚类、密度估计",
+        "python_library": "sklearn",
+        "complexity": "O(n·k·d²·iter)",
+        "pros": ["软分配", "概率框架"],
+        "cons": ["需指定成分数"],
+        "innovation_score": 0.55
+      },
+      "SpectralClustering": {
+        "full_name": "Spectral Clustering",
+        "use_case": "非凸形状聚类",
+        "python_library": "sklearn",
+        "complexity": "O(n³)",
+        "pros": ["发现复杂结构"],
+        "cons": ["计算慢", "需指定k"],
+        "innovation_score": 0.7
       }
     }
   },
   "problem_type_recommendations": {
-    "A": ["ODE", "PDE", "FiniteElement", "Optimization"],
-    "B": ["GraphTheory", "DynamicProgramming", "MILP", "Heuristics"],
-    "C": ["MachineLearning", "TimeSeries", "Clustering", "Regression"],
-    "D": ["NetworkFlow", "MILP", "Scheduling", "VRP"],
-    "E": ["MultiObjective", "SystemDynamics", "Sustainability"],
-    "F": ["GameTheory", "ABM", "PolicyAnalysis", "DecisionMaking"]
+    "A": {
+      "primary": ["ODE", "PDE", "FiniteElement", "Optimization"],
+      "innovative": ["PINN", "FNO", "DeepONet", "KAN"],
+      "visualization": ["3D surface", "contour", "streamplot", "animation"],
+      "sensitivity": ["Sobol", "Morris"]
+    },
+    "B": {
+      "primary": ["GraphTheory", "DynamicProgramming", "MILP", "Heuristics"],
+      "innovative": ["GNN", "DQN", "ACO", "SimulatedAnnealing"],
+      "visualization": ["network graph", "tree diagram", "flow chart"],
+      "sensitivity": ["parameter sweep", "scenario analysis"]
+    },
+    "C": {
+      "primary": ["MachineLearning", "TimeSeries", "Clustering", "Regression"],
+      "innovative": ["Transformer", "CausalInference", "SHAP", "ConformalPrediction"],
+      "visualization": ["SHAP summary", "partial dependence", "time series decomposition"],
+      "sensitivity": ["feature importance", "cross-validation"]
+    },
+    "D": {
+      "primary": ["NetworkFlow", "MILP", "Scheduling", "VRP"],
+      "innovative": ["DQN", "PPO", "ACO", "DiscreteEventSimulation"],
+      "visualization": ["Gantt chart", "network flow", "schedule timeline", "Sankey"],
+      "sensitivity": ["capacity analysis", "bottleneck identification"]
+    },
+    "E": {
+      "primary": ["MultiObjective", "SystemDynamics", "Sustainability"],
+      "innovative": ["NSGA-III", "MOEAD", "CausalForest", "DoubleMachineLearning"],
+      "visualization": ["Pareto front", "radar chart", "scenario comparison", "trade-off"],
+      "sensitivity": ["Sobol", "trade-off analysis"]
+    },
+    "F": {
+      "primary": ["GameTheory", "ABM", "PolicyAnalysis", "DecisionMaking"],
+      "innovative": ["MARL", "EvolutionaryGameTheory", "SyntheticControl", "CausalGraph"],
+      "visualization": ["game tree", "policy impact", "agent simulation", "stakeholder"],
+      "sensitivity": ["stakeholder analysis", "policy robustness"]
+    }
+  },
+  "innovation_guidelines": {
+    "high_innovation_combinations": [
+      {
+        "pattern": "PINN + Traditional Solver",
+        "description": "用PINN加速传统PDE求解，对比验证",
+        "problem_types": ["A"],
+        "innovation_score": 0.95
+      },
+      {
+        "pattern": "KAN + Symbolic Regression",
+        "description": "用KAN发现物理定律，符号回归验证",
+        "problem_types": ["A", "C"],
+        "innovation_score": 0.98
+      },
+      {
+        "pattern": "Transformer + SHAP",
+        "description": "时间序列预测 + 可解释性分析",
+        "problem_types": ["C"],
+        "innovation_score": 0.9
+      },
+      {
+        "pattern": "GNN + Optimization",
+        "description": "图神经网络特征 + 优化求解",
+        "problem_types": ["B", "D"],
+        "innovation_score": 0.92
+      },
+      {
+        "pattern": "Causal + ML Prediction",
+        "description": "因果推断指导预测模型",
+        "problem_types": ["C", "E", "F"],
+        "innovation_score": 0.9
+      },
+      {
+        "pattern": "RL + MPC",
+        "description": "强化学习 + 模型预测控制",
+        "problem_types": ["D"],
+        "innovation_score": 0.93
+      },
+      {
+        "pattern": "NSGA-III + System Dynamics",
+        "description": "多目标优化 + 系统动力学",
+        "problem_types": ["E"],
+        "innovation_score": 0.88
+      },
+      {
+        "pattern": "MARL + Game Theory",
+        "description": "多智能体强化学习 + 博弈分析",
+        "problem_types": ["F"],
+        "innovation_score": 0.94
+      },
+      {
+        "pattern": "FNO + Uncertainty Quantification",
+        "description": "神经算子 + 不确定性量化",
+        "problem_types": ["A"],
+        "innovation_score": 0.96
+      },
+      {
+        "pattern": "Conformal + Any ML",
+        "description": "保形预测提供可靠置信区间",
+        "problem_types": ["C", "E"],
+        "innovation_score": 0.9
+      }
+    ],
+    "scoring_criteria": {
+      "novelty": 0.3,
+      "technical_depth": 0.25,
+      "problem_fit": 0.25,
+      "interpretability": 0.2
+    }
   }
 }
