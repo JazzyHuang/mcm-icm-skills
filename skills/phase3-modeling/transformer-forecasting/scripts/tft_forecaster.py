@@ -135,6 +135,49 @@ class TFTForecaster:
             self.num_attention_heads, self.dropout
         ).to(self.device)
         
+    def _prepare_data(self, data: pd.DataFrame, num_features: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """准备训练数据，将DataFrame转换为模型输入格式"""
+        features = self.time_varying_unknown + self.time_varying_known
+        if not features:
+            features = ['target']
+        
+        # 提取特征数据
+        available_features = [f for f in features if f in data.columns]
+        if not available_features:
+            # 如果没有匹配的列，使用所有数值列
+            available_features = data.select_dtypes(include=[np.number]).columns.tolist()
+        
+        if not available_features:
+            raise ValueError("No numeric features found in the data")
+        
+        values = data[available_features].values
+        
+        # 创建序列样本
+        n_samples = max(1, len(values) - self.max_encoder_length - self.max_prediction_length + 1)
+        X_list = []
+        y_list = []
+        
+        for i in range(n_samples):
+            X_seq = values[i:i + self.max_encoder_length]
+            y_seq = values[i + self.max_encoder_length:i + self.max_encoder_length + self.max_prediction_length]
+            
+            # 确保序列长度正确
+            if len(X_seq) == self.max_encoder_length and len(y_seq) == self.max_prediction_length:
+                X_list.append(X_seq)
+                # 为3个分位数复制目标值
+                y_list.append(np.tile(y_seq[:, :1], (1, 3)))
+        
+        if not X_list:
+            # 如果数据不足以创建完整序列，使用填充
+            X_list = [np.tile(values[:min(len(values), self.max_encoder_length)], 
+                             (self.max_encoder_length // max(1, len(values)) + 1, 1))[:self.max_encoder_length]]
+            y_list = [np.zeros((self.max_prediction_length, 3))]
+        
+        X = torch.tensor(np.array(X_list), dtype=torch.float32, device=self.device)
+        y = torch.tensor(np.array(y_list), dtype=torch.float32, device=self.device)
+        
+        return X, y
+    
     def fit(
         self,
         train_data: pd.DataFrame,
@@ -145,7 +188,7 @@ class TFTForecaster:
         verbose: int = 10
     ):
         """训练模型"""
-        # 简化的数据处理
+        # 数据处理
         features = self.time_varying_unknown + self.time_varying_known
         num_features = len(features) if features else 1
         
@@ -154,24 +197,53 @@ class TFTForecaster:
         optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
         criterion = nn.MSELoss()
         
-        # 模拟训练数据
-        X_train = torch.randn(100, self.max_encoder_length, num_features).to(self.device)
-        y_train = torch.randn(100, self.max_prediction_length, 3).to(self.device)
+        # 使用实际训练数据
+        X_train, y_train = self._prepare_data(train_data, num_features)
+        
+        # 准备验证数据（如果提供）
+        X_val, y_val = None, None
+        if val_data is not None:
+            X_val, y_val = self._prepare_data(val_data, num_features)
         
         for epoch in range(epochs):
             self.model.train()
-            optimizer.zero_grad()
             
-            outputs, attn = self.model(X_train)
-            loss = criterion(outputs, y_train)
-            loss.backward()
-            optimizer.step()
+            # Mini-batch训练
+            n_samples = X_train.shape[0]
+            perm = torch.randperm(n_samples)
+            total_loss = 0
+            n_batches = 0
             
-            self.training_history['train_loss'].append(loss.item())
+            for i in range(0, n_samples, batch_size):
+                idx = perm[i:i+batch_size]
+                X_batch, y_batch = X_train[idx], y_train[idx]
+                
+                optimizer.zero_grad()
+                outputs, attn = self.model(X_batch)
+                loss = criterion(outputs, y_batch)
+                loss.backward()
+                optimizer.step()
+                
+                total_loss += loss.item()
+                n_batches += 1
+            
+            avg_train_loss = total_loss / max(n_batches, 1)
+            self.training_history['train_loss'].append(avg_train_loss)
             self.attention_weights = attn.detach()
             
+            # 验证
+            if X_val is not None:
+                self.model.eval()
+                with torch.no_grad():
+                    val_outputs, _ = self.model(X_val)
+                    val_loss = criterion(val_outputs, y_val).item()
+                    self.training_history['val_loss'].append(val_loss)
+            
             if verbose and (epoch + 1) % verbose == 0:
-                print(f"Epoch {epoch+1}/{epochs}, Loss: {loss.item():.6f}")
+                msg = f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_train_loss:.6f}"
+                if X_val is not None:
+                    msg += f", Val Loss: {self.training_history['val_loss'][-1]:.6f}"
+                print(msg)
                 
         return self.training_history
     

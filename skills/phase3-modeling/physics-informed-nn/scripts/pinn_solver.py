@@ -294,7 +294,15 @@ class PINNSolver:
                 u_ic = self.network(points['initial'])
                 x_ic = points['initial'][:, 0:1]
                 if callable(ic_func):
-                    ic_values = torch.sin(np.pi * x_ic)  # 默认初始条件
+                    # 调用用户提供的初始条件函数
+                    ic_result = ic_func(x_ic)
+                    if isinstance(ic_result, np.ndarray):
+                        ic_values = torch.tensor(ic_result, dtype=torch.float32, device=self.device)
+                    elif isinstance(ic_result, torch.Tensor):
+                        ic_values = ic_result.to(self.device)
+                    else:
+                        # 处理标量或其他类型
+                        ic_values = torch.tensor(ic_result, dtype=torch.float32, device=self.device).expand_like(x_ic)
                 else:
                     ic_values = ic_func
                 loss_ic = torch.mean((u_ic - ic_values) ** 2)

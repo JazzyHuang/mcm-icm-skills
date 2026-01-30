@@ -224,14 +224,18 @@ class KAN(nn.Module):
         
         fig, axes = plt.subplots(out_features, in_features, 
                                  figsize=(3*in_features, 2.5*out_features))
-        if out_features == 1:
-            axes = [axes]
-        if in_features == 1:
-            axes = [[ax] for ax in axes]
+        
+        # 规范化axes为2D数组，便于统一索引
+        if out_features == 1 and in_features == 1:
+            axes = np.array([[axes]])
+        elif out_features == 1:
+            axes = np.array([axes])  # 保持为 (1, in_features) 形状
+        elif in_features == 1:
+            axes = np.array([[ax] for ax in axes])  # 转为 (out_features, 1) 形状
             
         for i in range(out_features):
             for j in range(in_features):
-                ax = axes[i][j] if out_features > 1 else axes[j]
+                ax = axes[i][j]
                 
                 # 计算该边的激活函数
                 x_input = torch.zeros(100, in_features, device=self.device)
@@ -347,10 +351,10 @@ class KANSymbolicRegression:
                 y_fit = coef[0] * y_candidate + coef[1]
                 mse = np.mean((y - y_fit) ** 2)
                 
-                if mse < best_score:
+                # 只有当MSE改善且系数足够大时，才同时更新best_score和best_match
+                if mse < best_score and abs(coef[0]) > 0.1:
                     best_score = mse
-                    if abs(coef[0]) > 0.1:  # 系数足够大
-                        best_match = f"{coef[0]:.2f}*{name}"
+                    best_match = f"{coef[0]:.2f}*{name}"
             except:
                 continue
                 
