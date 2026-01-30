@@ -92,9 +92,78 @@ description: 自动收集美赛建模所需的数据。支持从World Bank、OEC
     "outliers_removed": 10,
     "features_created": 5
   },
-  "data_quality_score": 0.95
+  "data_quality_score": 0.95,
+  "citations": [
+    {
+      "bibtex_key": "worldbank_gdp_2024",
+      "bibtex": "@online{...}",
+      "category": "data"
+    }
+  ]
 }
 ```
+
+## 数据源引用生成（新增）
+
+### 自动引用功能
+
+每次从数据源获取数据时，自动生成对应的BibTeX引用：
+
+```python
+from scripts.data_citation_generator import generate_data_citation
+
+# 获取数据时自动生成引用
+data, citation = fetch_worldbank_data_with_citation(
+    indicator="NY.GDP.PCAP.CD",
+    countries=["USA", "CHN"],
+    start_year=2020,
+    end_year=2024
+)
+```
+
+### 引用格式示例
+
+#### World Bank数据
+```bibtex
+@online{worldbank_gdp_2024,
+  author = {{World Bank}},
+  title = {{World Bank Open Data: GDP per capita (current US\$)}},
+  year = {2024},
+  url = {https://data.worldbank.org/indicator/NY.GDP.PCAP.CD},
+  urldate = {2024-01-30},
+  note = {Countries: USA, CHN, DEU; Period: 2020-2024}
+}
+```
+
+#### UN Data
+```bibtex
+@online{undata_population_2024,
+  author = {{United Nations}},
+  title = {{UN Data: Population Indicators}},
+  year = {2024},
+  url = {https://data.un.org/},
+  urldate = {2024-01-30},
+  note = {Global population statistics}
+}
+```
+
+#### OECD Data
+```bibtex
+@online{oecd_education_2024,
+  author = {{OECD}},
+  title = {{OECD Data: Education Statistics}},
+  year = {2024},
+  url = {https://data.oecd.org/},
+  urldate = {2024-01-30},
+  note = {Education expenditure indicators}
+}
+```
+
+### 引用收集
+
+所有生成的数据源引用会被收集到：
+- `output/data/data_citations.bib` - BibTeX文件
+- `output/data/data_citations.json` - 结构化JSON
 
 ## 使用脚本
 
@@ -128,3 +197,5 @@ cleaned_data = clean_data(
 
 - `problem-parser` - 识别数据需求
 - `literature-searcher` - 获取数据来源建议
+- `citation-diversity-validator` - 验证数据源引用多样性
+- `citation-manager` - 管理所有引用

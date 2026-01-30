@@ -1,15 +1,54 @@
+# ===========================================
 # API Keys Configuration Template
+# ===========================================
 # Copy this file to api_keys.yaml and fill in your keys
 # DO NOT commit api_keys.yaml to version control!
 
+# ===========================================
+# 学术搜索 API (Academic Search APIs)
+# ===========================================
+
 # Semantic Scholar API Key
 # Get yours at: https://www.semanticscholar.org/product/api
+# Note: Optional but recommended for higher rate limits
 semantic_scholar:
-  api_key: "YOUR_SEMANTIC_SCHOLAR_API_KEY"
+  api_key: ""  # Leave empty to use without key (lower rate limit)
 
 # CrossRef API (uses mailto as polite pool identifier)
+# Setting mailto gives you access to the polite pool with higher rate limits
 crossref:
   mailto: "your-email@example.com"
+
+# Google Scholar via SerpAPI (Required for Google Scholar search)
+# Get yours at: https://serpapi.com/
+# Free tier: 100 searches/month
+serpapi:
+  api_key: ""  # Required for Google Scholar functionality
+
+# IEEE Xplore API (Optional, for engineering papers)
+# Get yours at: https://developer.ieee.org/
+ieee:
+  api_key: ""
+
+# PubMed API Key (Optional, for higher rate limits)
+# Get yours at: https://www.ncbi.nlm.nih.gov/account/settings/
+pubmed:
+  api_key: ""
+  # Without key: 3 requests/second
+  # With key: 10 requests/second
+
+# ===========================================
+# 新闻和媒体 API (News & Media APIs)
+# ===========================================
+
+# NewsAPI.org (Optional, for news source citations)
+# Get yours at: https://newsapi.org/
+newsapi:
+  api_key: ""
+
+# ===========================================
+# 计算和求解器 (Computation & Solvers)
+# ===========================================
 
 # Gurobi License (optional, for commercial solver)
 # Academic licenses are free: https://www.gurobi.com/academia/academic-program-and-licenses/
@@ -18,13 +57,32 @@ gurobi:
   # Or use environment variables:
   # GRB_LICENSE_FILE: "/path/to/gurobi.lic"
 
+# ===========================================
+# LLM APIs (大语言模型)
+# ===========================================
+
 # OpenAI API (optional, for advanced LLM features)
 openai:
-  api_key: "YOUR_OPENAI_API_KEY"
-  organization: "YOUR_ORG_ID"  # optional
+  api_key: ""
+  organization: ""  # optional
 
 # Anthropic API (optional)
 anthropic:
-  api_key: "YOUR_ANTHROPIC_API_KEY"
+  api_key: ""
 
-# Note: World Bank, OECD, UN Data, and arXiv APIs do not require keys
+# ===========================================
+# 说明 (Notes)
+# ===========================================
+
+# 以下API无需密钥 (These APIs do not require keys):
+# - OpenAlex (免费，240M+文献)
+# - arXiv API
+# - World Bank Data API
+# - UN Data API
+# - OECD Data API
+# - CrossRef API (无密钥也可使用，但有速率限制)
+
+# 推荐配置 (Recommended Setup):
+# 1. serpapi.api_key - 用于Google Scholar搜索（覆盖面最广）
+# 2. semantic_scholar.api_key - 用于高级引用分析
+# 3. crossref.mailto - 用于获得更高速率限制

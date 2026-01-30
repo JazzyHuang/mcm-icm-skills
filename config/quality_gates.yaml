@@ -1,0 +1,486 @@
+# MCM/ICM 论文质量门禁配置
+# Quality Gates Configuration for O-Award Level Papers
+#
+# 说明: 定义各阶段必须通过的质量标准
+# 未通过门禁的阶段将触发回退或人工干预
+
+# ============================================================
+# 全局设置
+# ============================================================
+global:
+  # 启用质量门禁
+  enabled: true
+  
+  # 门禁检查模式: strict (严格) / lenient (宽松) / adaptive (自适应)
+  mode: strict
+  
+  # 失败处理策略: retry (重试) / fallback (降级) / pause (暂停等待人工)
+  failure_strategy: retry
+  
+  # 最大重试次数
+  max_retries: 3
+  
+  # 是否允许跳过低优先级门禁
+  allow_skip_low_priority: false
+
+# ============================================================
+# 阶段1: 输入处理门禁
+# ============================================================
+phase1_input:
+  name: "Input Processing Gates"
+  
+  gates:
+    problem_parsing:
+      description: "题目解析完整性检查"
+      priority: high
+      criteria:
+        - name: problem_type_identified
+          description: "题型已识别"
+          required: true
+        - name: key_questions_extracted
+          description: "关键问题已提取"
+          required: true
+          min_count: 1
+        - name: data_files_processed
+          description: "数据文件已处理"
+          required: false
+    
+    citation_collection:
+      description: "引用收集门禁"
+      priority: high
+      criteria:
+        - name: total_citations
+          description: "引用总数"
+          min: 8
+          max: 15
+        - name: citation_diversity_score
+          description: "引用多样性评分"
+          min: 0.75
+        - name: academic_papers_count
+          description: "学术论文数量"
+          min: 3
+        - name: problem_statement_cited
+          description: "题目声明已引用"
+          required: true
+
+# ============================================================
+# 阶段2: 问题分析门禁
+# ============================================================
+phase2_analysis:
+  name: "Problem Analysis Gates"
+  
+  gates:
+    assumption_quality:
+      description: "假设质量检查"
+      priority: high
+      criteria:
+        - name: assumptions_count
+          description: "假设数量"
+          min: 5
+          max: 12
+        - name: all_assumptions_justified
+          description: "所有假设都有论证"
+          required: true
+        - name: no_unreasonable_assumptions
+          description: "无明显不合理假设"
+          required: true
+    
+    variable_definition:
+      description: "变量定义完整性"
+      priority: medium
+      criteria:
+        - name: all_variables_defined
+          description: "所有变量已定义"
+          required: true
+        - name: notation_table_complete
+          description: "符号表完整"
+          required: true
+
+# ============================================================
+# 阶段3: 模型构建门禁
+# ============================================================
+phase3_modeling:
+  name: "Model Building Gates"
+  
+  gates:
+    model_selection:
+      description: "模型选择合理性"
+      priority: high
+      criteria:
+        - name: model_justification_present
+          description: "有模型选择论证"
+          required: true
+        - name: alternative_methods_compared
+          description: "与备选方法对比"
+          min: 2
+        - name: innovation_score
+          description: "创新性评分"
+          min: 0.70
+    
+    model_implementation:
+      description: "模型实现正确性"
+      priority: high
+      criteria:
+        - name: code_verified
+          description: "代码已验证"
+          required: true
+        - name: no_runtime_errors
+          description: "无运行时错误"
+          required: true
+        - name: results_reproducible
+          description: "结果可复现"
+          required: true
+
+# ============================================================
+# 阶段4: 验证分析门禁
+# ============================================================
+phase4_validation:
+  name: "Validation Gates"
+  
+  gates:
+    sensitivity_analysis:
+      description: "敏感性分析完整性"
+      priority: high
+      criteria:
+        - name: global_sensitivity_performed
+          description: "执行了全局敏感性分析"
+          required: true
+        - name: parameters_analyzed
+          description: "分析的参数数量"
+          min: 5
+        - name: sobol_indices_computed
+          description: "计算了Sobol指数"
+          required: true
+    
+    error_analysis:
+      description: "误差分析完整性"
+      priority: high
+      criteria:
+        - name: multiple_metrics_reported
+          description: "报告多种误差指标"
+          min: 3
+        - name: baseline_comparison_present
+          description: "与基准方法对比"
+          required: true
+        - name: error_visualization_present
+          description: "有误差可视化"
+          required: true
+    
+    model_validation:
+      description: "模型验证充分性"
+      priority: high
+      criteria:
+        - name: cross_validation_performed
+          description: "执行了交叉验证"
+          required: true
+        - name: validation_r2
+          description: "验证集R²"
+          min: 0.80
+        - name: overfitting_checked
+          description: "检查了过拟合"
+          required: true
+
+# ============================================================
+# 阶段5: 内容生成门禁
+# ============================================================
+phase5_writing:
+  name: "Content Generation Gates"
+  
+  gates:
+    abstract_quality:
+      description: "摘要质量门禁"
+      priority: critical  # 最高优先级
+      criteria:
+        - name: abstract_score
+          description: "摘要综合评分"
+          min: 0.85
+        - name: hook_quality
+          description: "Hook质量评分"
+          min: 0.80
+        - name: quantification_density
+          description: "量化密度评分"
+          min: 0.75
+        - name: word_count
+          description: "词数范围"
+          min: 300
+          max: 500
+        - name: no_cliche_opening
+          description: "无陈词滥调开头"
+          required: true
+        - name: keywords_present
+          description: "关键词存在"
+          required: true
+          min_count: 5
+          max_count: 7
+    
+    section_completeness:
+      description: "章节完整性"
+      priority: high
+      criteria:
+        - name: all_required_sections_present
+          description: "所有必需章节存在"
+          required: true
+          sections:
+            - "Abstract"
+            - "Introduction"
+            - "Problem Analysis"
+            - "Assumptions"
+            - "Model Design"
+            - "Model Implementation"
+            - "Results"
+            - "Sensitivity Analysis"
+            - "Strengths and Weaknesses"
+            - "Conclusions"
+            - "References"
+        - name: section_length_appropriate
+          description: "章节长度合适"
+          required: true
+
+# ============================================================
+# 阶段6: 可视化门禁
+# ============================================================
+phase6_visualization:
+  name: "Visualization Gates"
+  
+  gates:
+    figure_quality:
+      description: "图表质量门禁"
+      priority: high
+      criteria:
+        - name: figure_count
+          description: "图表数量"
+          min: 5
+          max: 15
+        - name: all_figures_have_captions
+          description: "所有图表有标题"
+          required: true
+        - name: figure_resolution
+          description: "图表分辨率"
+          min_dpi: 300
+        - name: publication_quality_score
+          description: "出版级质量评分"
+          min: 0.80
+        - name: figures_referenced_in_text
+          description: "所有图表在正文引用"
+          required: true
+    
+    figure_narrative:
+      description: "图表叙事完整性"
+      priority: medium
+      criteria:
+        - name: all_figures_have_narrative
+          description: "所有图表有叙事"
+          required: true
+        - name: interpretation_depth
+          description: "解释深度评分"
+          min: 0.75
+
+# ============================================================
+# 阶段7: 文档整合门禁
+# ============================================================
+phase7_integration:
+  name: "Document Integration Gates"
+  
+  gates:
+    latex_compilation:
+      description: "LaTeX编译门禁"
+      priority: critical
+      criteria:
+        - name: compilation_success
+          description: "编译成功"
+          required: true
+        - name: no_warnings
+          description: "无警告"
+          required: false  # 允许少量警告
+          max_warnings: 5
+        - name: no_errors
+          description: "无错误"
+          required: true
+    
+    format_compliance:
+      description: "格式合规门禁"
+      priority: high
+      criteria:
+        - name: page_count
+          description: "页数"
+          max: 25
+        - name: font_size_correct
+          description: "字号正确"
+          required: true
+        - name: margins_correct
+          description: "页边距正确"
+          required: true
+        - name: anonymization_complete
+          description: "匿名化完成"
+          required: true
+
+# ============================================================
+# 阶段8: 质量保证门禁
+# ============================================================
+phase8_quality:
+  name: "Quality Assurance Gates"
+  
+  gates:
+    hallucination_check:
+      description: "幻觉检测门禁"
+      priority: critical
+      criteria:
+        - name: hallucination_count
+          description: "幻觉数量"
+          max: 0  # 零容忍
+        - name: all_citations_verified
+          description: "所有引用已验证"
+          required: true
+        - name: no_fabricated_data
+          description: "无编造数据"
+          required: true
+    
+    grammar_quality:
+      description: "语法质量门禁"
+      priority: high
+      criteria:
+        - name: lat_score
+          description: "LAT评分"
+          min: 7.5
+        - name: chinglish_score
+          description: "中式英语评分"
+          max: 0.20  # 越低越好
+        - name: grammar_errors
+          description: "语法错误数"
+          max: 5
+    
+    consistency_check:
+      description: "一致性检查门禁"
+      priority: high
+      criteria:
+        - name: consistency_score
+          description: "一致性评分"
+          min: 0.90
+        - name: terminology_consistent
+          description: "术语一致"
+          required: true
+        - name: data_consistent
+          description: "数据一致"
+          required: true
+        - name: symbol_consistent
+          description: "符号一致"
+          required: true
+
+# ============================================================
+# 阶段9: 最终优化门禁
+# ============================================================
+phase9_optimization:
+  name: "Final Optimization Gates"
+  
+  gates:
+    academic_english:
+      description: "学术英语质量门禁"
+      priority: high
+      criteria:
+        - name: academic_tone_score
+          description: "学术语气评分"
+          min: 0.85
+        - name: no_informal_expressions
+          description: "无非正式表达"
+          required: true
+    
+    final_polish:
+      description: "最终润色门禁"
+      priority: medium
+      criteria:
+        - name: flow_score
+          description: "流畅度评分"
+          min: 0.80
+        - name: transitions_present
+          description: "过渡句存在"
+          required: true
+
+# ============================================================
+# 阶段10: 提交验证门禁
+# ============================================================
+phase10_submission:
+  name: "Submission Validation Gates"
+  
+  gates:
+    pre_submission:
+      description: "提交前验证门禁"
+      priority: critical
+      criteria:
+        - name: all_previous_gates_passed
+          description: "所有前置门禁通过"
+          required: true
+        - name: control_number_correct
+          description: "控制号正确"
+          required: true
+        - name: problem_choice_marked
+          description: "题目选择已标记"
+          required: true
+        - name: file_size_acceptable
+          description: "文件大小可接受"
+          max_mb: 20
+        - name: pdf_readable
+          description: "PDF可读"
+          required: true
+    
+    final_checklist:
+      description: "最终检查清单门禁"
+      priority: critical
+      criteria:
+        - name: summary_sheet_first_page
+          description: "摘要页在首页"
+          required: true
+        - name: no_identifying_info
+          description: "无身份信息"
+          required: true
+        - name: references_complete
+          description: "参考文献完整"
+          required: true
+        - name: all_figures_included
+          description: "所有图表包含"
+          required: true
+
+# ============================================================
+# 阶段回退配置
+# ============================================================
+fallback_rules:
+  # 当门禁失败时的回退规则
+  
+  phase5_to_phase4:
+    trigger:
+      gate: abstract_quality
+      condition: "score < 0.70"
+    action: "retry_phase4_validation"
+    max_retries: 2
+  
+  phase8_to_phase5:
+    trigger:
+      gate: grammar_quality
+      condition: "lat_score < 6.5"
+    action: "retry_phase5_writing"
+    max_retries: 2
+  
+  phase8_to_phase6:
+    trigger:
+      gate: consistency_check
+      condition: "figure_issues > 3"
+    action: "retry_phase6_visualization"
+    max_retries: 1
+
+# ============================================================
+# 报告配置
+# ============================================================
+reporting:
+  # 生成详细的门禁报告
+  generate_detailed_report: true
+  
+  # 报告格式
+  report_format: "json"  # json / markdown / both
+  
+  # 报告输出路径
+  report_path: "output/quality_reports/"
+  
+  # 是否包含建议
+  include_recommendations: true
+  
+  # 是否记录历史
+  track_history: true

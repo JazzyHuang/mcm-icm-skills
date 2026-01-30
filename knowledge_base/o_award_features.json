@@ -1,4 +1,10 @@
 {
+  "metadata": {
+    "version": "2.0",
+    "description": "O奖论文特征定义增强版：包含评分标准、检查清单、常见错误模式和降级风险因素",
+    "last_updated": "2026-01"
+  },
+  
   "o_award_criteria": {
     "overall_impression": {
       "weight": 0.15,
@@ -50,6 +56,7 @@
       ]
     }
   },
+  
   "abstract_checklist": {
     "structure": [
       "包含问题背景 (1-2句)",
@@ -66,13 +73,22 @@
       "专业学术语言",
       "5-7个关键词"
     ],
+    "hook_requirements": [
+      "开头句必须抓住注意力",
+      "避免陈词滥调开头",
+      "包含震撼性数据或发现",
+      "Hook句长度25-35词"
+    ],
     "common_mistakes": [
       "词数不符",
       "缺少量化结果",
       "结构不完整",
-      "语言不专业"
+      "语言不专业",
+      "使用陈词滥调开头",
+      "缺少关键词"
     ]
   },
+  
   "model_checklist": {
     "formulation": [
       "目标函数清晰",
@@ -89,8 +105,14 @@
       "数值验证",
       "敏感性分析",
       "鲁棒性检验"
+    ],
+    "justification": [
+      "模型选择有论证",
+      "与至少2种备选方法对比",
+      "量化说明选择依据"
     ]
   },
+  
   "sensitivity_checklist": {
     "methods": [
       "全局敏感性分析 (Sobol)",
@@ -103,12 +125,14 @@
       "鲁棒性结论"
     ]
   },
+  
   "writing_checklist": {
     "language": [
       "时态正确",
       "语法无误",
       "术语一致",
-      "表述专业"
+      "表述专业",
+      "无中式英语"
     ],
     "format": [
       "章节完整",
@@ -117,6 +141,7 @@
       "页数符合要求"
     ]
   },
+  
   "common_winner_traits": [
     "问题理解深刻，不仅回答了问题，还扩展了分析范围",
     "模型创新性强，通常有独特的组合或改进",
@@ -124,6 +149,347 @@
     "可视化专业，图表数量多且质量高",
     "语言流畅专业，几乎无语法错误",
     "假设论证充分，每个假设都有合理解释",
-    "自我批评诚实，清楚说明局限性"
-  ]
+    "自我批评诚实，清楚说明局限性",
+    "引用来源广泛多样，体现深入的信息搜集能力"
+  ],
+  
+  "common_error_patterns": {
+    "abstract_errors": {
+      "category": "摘要常见错误",
+      "severity": "critical",
+      "errors": [
+        {
+          "error": "陈词滥调开头",
+          "description": "使用'With the development of...'等陈词滥调开头",
+          "impact": "评委第一印象差，可能直接降级",
+          "solution": "使用数据冲击钩子或问题重要性钩子"
+        },
+        {
+          "error": "缺少量化结果",
+          "description": "摘要中没有具体数字，只有定性描述",
+          "impact": "无法展示工作的具体价值",
+          "solution": "至少包含4个具体数字"
+        },
+        {
+          "error": "结构不完整",
+          "description": "缺少方法、结果或结论部分",
+          "impact": "评委无法快速了解全文",
+          "solution": "确保6个结构元素齐全"
+        },
+        {
+          "error": "词数不符",
+          "description": "少于300词或多于500词",
+          "impact": "违反格式要求",
+          "solution": "严格控制在300-500词"
+        },
+        {
+          "error": "缺少关键词",
+          "description": "没有关键词或关键词不相关",
+          "impact": "影响论文检索和分类",
+          "solution": "提供5-7个相关关键词"
+        }
+      ]
+    },
+    "model_errors": {
+      "category": "模型常见错误",
+      "severity": "high",
+      "errors": [
+        {
+          "error": "模型堆砌",
+          "description": "使用过多模型而无明确理由",
+          "impact": "显得不成熟，缺乏深度",
+          "solution": "选择最适合的1-2个模型并深入"
+        },
+        {
+          "error": "缺乏模型选择论证",
+          "description": "直接使用模型而不解释为什么",
+          "impact": "评委质疑选择合理性",
+          "solution": "与备选方法对比并量化说明"
+        },
+        {
+          "error": "假设无论证",
+          "description": "列出假设但不解释合理性",
+          "impact": "假设可信度低",
+          "solution": "每个假设都需要论证"
+        },
+        {
+          "error": "数学推导错误",
+          "description": "公式推导有逻辑或计算错误",
+          "impact": "严重影响可信度",
+          "solution": "仔细验证所有推导步骤"
+        },
+        {
+          "error": "变量未定义",
+          "description": "使用符号但未在前文定义",
+          "impact": "读者困惑",
+          "solution": "在符号表或首次出现时定义"
+        }
+      ]
+    },
+    "validation_errors": {
+      "category": "验证常见错误",
+      "severity": "high",
+      "errors": [
+        {
+          "error": "缺乏敏感性分析",
+          "description": "没有进行参数敏感性分析",
+          "impact": "无法证明模型鲁棒性",
+          "solution": "至少进行Sobol全局敏感性分析"
+        },
+        {
+          "error": "仅报告单一指标",
+          "description": "只报告一种误差指标",
+          "impact": "验证不充分",
+          "solution": "报告3-5种误差指标"
+        },
+        {
+          "error": "无基准对比",
+          "description": "未与现有方法对比",
+          "impact": "无法证明方法优势",
+          "solution": "与至少2种基准方法对比"
+        },
+        {
+          "error": "缺乏统计显著性",
+          "description": "未进行统计检验",
+          "impact": "结果可信度低",
+          "solution": "使用配对t检验等方法"
+        }
+      ]
+    },
+    "writing_errors": {
+      "category": "写作常见错误",
+      "severity": "medium",
+      "errors": [
+        {
+          "error": "中式英语",
+          "description": "使用不地道的英语表达",
+          "impact": "影响可读性和专业性",
+          "solution": "参考中式英语检测器进行修正"
+        },
+        {
+          "error": "时态不一致",
+          "description": "同一段落混用多种时态",
+          "impact": "阅读困难",
+          "solution": "方法用现在时，实验用过去时"
+        },
+        {
+          "error": "术语不一致",
+          "description": "同一概念使用不同术语",
+          "impact": "读者困惑",
+          "solution": "使用一致性检查器验证"
+        },
+        {
+          "error": "图表引用缺失",
+          "description": "图表未在正文中引用",
+          "impact": "图表成为孤立内容",
+          "solution": "每个图表必须在正文引用"
+        },
+        {
+          "error": "引用格式不统一",
+          "description": "混用不同引用格式",
+          "impact": "不专业",
+          "solution": "统一使用一种引用格式"
+        }
+      ]
+    },
+    "visualization_errors": {
+      "category": "可视化常见错误",
+      "severity": "medium",
+      "errors": [
+        {
+          "error": "分辨率不足",
+          "description": "图表模糊不清",
+          "impact": "难以阅读",
+          "solution": "使用300+ DPI"
+        },
+        {
+          "error": "缺少坐标轴标签",
+          "description": "图表没有标注坐标轴",
+          "impact": "无法理解图表含义",
+          "solution": "标注所有轴标签和单位"
+        },
+        {
+          "error": "颜色不友好",
+          "description": "使用红绿配色",
+          "impact": "色盲人群无法区分",
+          "solution": "使用色盲友好配色"
+        },
+        {
+          "error": "图表过度装饰",
+          "description": "使用3D效果、阴影等",
+          "impact": "干扰信息传达",
+          "solution": "简洁清晰的2D图表"
+        }
+      ]
+    }
+  },
+  
+  "downgrade_risk_factors": {
+    "critical_risks": {
+      "description": "可能直接导致从O奖降级的因素",
+      "factors": [
+        {
+          "factor": "抄袭或学术不端",
+          "impact": "直接取消资格",
+          "prevention": "确保原创性，正确引用"
+        },
+        {
+          "factor": "未完成所有问题",
+          "impact": "无法获得高等级奖项",
+          "prevention": "确保回答所有子问题"
+        },
+        {
+          "factor": "超过页数限制",
+          "impact": "违反规则，可能降级",
+          "prevention": "严格控制在25页以内"
+        },
+        {
+          "factor": "包含身份信息",
+          "impact": "违反匿名规则",
+          "prevention": "使用匿名化检查器"
+        },
+        {
+          "factor": "控制号错误",
+          "impact": "论文无法正确识别",
+          "prevention": "仔细核对控制号"
+        }
+      ]
+    },
+    "high_risks": {
+      "description": "可能从O奖降到M奖的因素",
+      "factors": [
+        {
+          "factor": "摘要质量差",
+          "impact": "初筛阶段被淘汰",
+          "prevention": "12轮以上迭代优化摘要"
+        },
+        {
+          "factor": "模型无创新",
+          "impact": "无法脱颖而出",
+          "prevention": "至少有一个明确的创新点"
+        },
+        {
+          "factor": "缺乏敏感性分析",
+          "impact": "验证不充分",
+          "prevention": "进行全局敏感性分析"
+        },
+        {
+          "factor": "严重语法错误",
+          "impact": "影响专业性",
+          "prevention": "LAT评分达到7.5+"
+        },
+        {
+          "factor": "图表数量不足",
+          "impact": "展示不充分",
+          "prevention": "至少5-15个高质量图表"
+        }
+      ]
+    },
+    "medium_risks": {
+      "description": "可能影响最终排名的因素",
+      "factors": [
+        {
+          "factor": "引用不够多样",
+          "impact": "信息搜集能力质疑",
+          "prevention": "覆盖4+类别信息源"
+        },
+        {
+          "factor": "局限性讨论不足",
+          "impact": "学术成熟度质疑",
+          "prevention": "诚实讨论3-5个局限性"
+        },
+        {
+          "factor": "过渡不自然",
+          "impact": "阅读体验差",
+          "prevention": "使用过渡句连接段落"
+        },
+        {
+          "factor": "数据不一致",
+          "impact": "可信度下降",
+          "prevention": "使用一致性检查器"
+        }
+      ]
+    }
+  },
+  
+  "citation_requirements": {
+    "total_range": [8, 15],
+    "diversity_categories": [
+      "academic_papers",
+      "government_reports",
+      "official_data_sources",
+      "problem_statement_references",
+      "technical_documentation",
+      "news_media"
+    ],
+    "minimum_categories": 4,
+    "academic_minimum": 3,
+    "recency_preference": "50% within last 5 years",
+    "category_weights": {
+      "academic_papers": 0.40,
+      "government_reports": 0.15,
+      "official_data_sources": 0.15,
+      "problem_statement_references": 0.15,
+      "other_sources": 0.15
+    },
+    "diversity_score_threshold": 0.75,
+    "required_sources": [
+      "题目声明(Problem Statement)必须引用",
+      "题目附带数据文件必须引用",
+      "至少3篇同行评审学术论文",
+      "至少1篇政府/官方机构报告",
+      "至少1个官方数据源引用"
+    ],
+    "recommended_search_sources": {
+      "academic": [
+        "Semantic Scholar",
+        "OpenAlex",
+        "arXiv",
+        "CrossRef",
+        "Google Scholar",
+        "PubMed (医学/生物)"
+      ],
+      "government": [
+        "World Bank Publications",
+        "UN Publications",
+        "OECD iLibrary",
+        "CDC/WHO/EPA Reports"
+      ],
+      "data": [
+        "World Bank Open Data",
+        "UN Data",
+        "OECD Data",
+        "Kaggle Datasets"
+      ]
+    }
+  },
+  
+  "quality_thresholds": {
+    "abstract": {
+      "total_score": 0.85,
+      "hook_quality": 0.80,
+      "quantification_density": 0.75
+    },
+    "language": {
+      "lat_score": 7.5,
+      "chinglish_score": 0.20,
+      "grammar_errors": 5
+    },
+    "consistency": {
+      "terminology": 0.95,
+      "data": 1.0,
+      "symbol": 1.0,
+      "overall": 0.90
+    },
+    "visualization": {
+      "figure_count_min": 5,
+      "figure_count_max": 15,
+      "quality_score": 0.80
+    },
+    "validation": {
+      "sensitivity_performed": true,
+      "baseline_comparison": true,
+      "error_metrics_count": 3
+    }
+  }
 }

@@ -1,0 +1,227 @@
+# ===========================================
+# 引用数据源配置
+# Citation Sources Configuration
+# ===========================================
+
+# 学术数据源
+academic_sources:
+  semantic_scholar:
+    enabled: true
+    api_key_required: false
+    priority: 1
+    base_url: "https://api.semanticscholar.org/graph/v1"
+    description: "AI驱动的学术搜索，提供引用关系"
+    rate_limit: 100  # requests per 5 minutes
+    
+  openalex:
+    enabled: true
+    api_key_required: false
+    priority: 2
+    base_url: "https://api.openalex.org"
+    description: "免费开放API，240M+学术文献"
+    rate_limit: 10  # requests per second
+    
+  arxiv:
+    enabled: true
+    api_key_required: false
+    priority: 3
+    base_url: "http://export.arxiv.org/api"
+    description: "预印本库，最新研究"
+    rate_limit: 3  # requests per second
+    
+  crossref:
+    enabled: true
+    api_key_required: false
+    priority: 4
+    base_url: "https://api.crossref.org"
+    description: "DOI注册机构，权威元数据"
+    rate_limit: 50  # requests per second (polite pool)
+    
+  google_scholar:
+    enabled: true
+    api_key_required: true
+    api_service: serpapi
+    priority: 5
+    base_url: "https://serpapi.com/search"
+    description: "覆盖面最广的学术搜索（需SerpAPI Key）"
+    rate_limit: 100  # depends on plan
+    
+  pubmed:
+    enabled: true
+    api_key_required: false
+    priority: 6
+    base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+    description: "医学/生物领域文献数据库"
+    rate_limit: 3  # requests per second without key
+
+# 政府/官方数据源
+government_sources:
+  worldbank_publications:
+    enabled: true
+    base_url: "https://documents.worldbank.org/"
+    search_url: "https://www.worldbank.org/en/search"
+    description: "世界银行报告和出版物"
+    
+  un_publications:
+    enabled: true
+    base_url: "https://www.un.org/en/library"
+    search_url: "https://digitallibrary.un.org/"
+    description: "联合国报告和出版物"
+    
+  oecd_library:
+    enabled: true
+    base_url: "https://www.oecd-ilibrary.org/"
+    description: "OECD报告和分析"
+    
+  who_publications:
+    enabled: true
+    base_url: "https://www.who.int/publications"
+    description: "世界卫生组织出版物"
+    
+  imf_publications:
+    enabled: true
+    base_url: "https://www.imf.org/en/Publications"
+    description: "国际货币基金组织出版物"
+
+# 官方数据源（用于数据引用）
+data_sources:
+  worldbank_data:
+    enabled: true
+    api_url: "https://api.worldbank.org/v2"
+    data_url: "https://data.worldbank.org"
+    author: "{World Bank}"
+    description: "世界银行开放数据"
+    
+  un_data:
+    enabled: true
+    data_url: "https://data.un.org/"
+    author: "{United Nations}"
+    description: "联合国统计数据"
+    
+  oecd_data:
+    enabled: true
+    api_url: "https://sdmx.oecd.org/public/rest/"
+    data_url: "https://data.oecd.org/"
+    author: "{OECD}"
+    description: "OECD统计数据"
+    
+  who_data:
+    enabled: true
+    data_url: "https://www.who.int/data/"
+    author: "{World Health Organization}"
+    description: "WHO全球健康数据"
+    
+  imf_data:
+    enabled: true
+    data_url: "https://data.imf.org/"
+    author: "{International Monetary Fund}"
+    description: "IMF经济数据"
+    
+  eurostat:
+    enabled: true
+    data_url: "https://ec.europa.eu/eurostat/"
+    author: "{Eurostat}"
+    description: "欧盟统计数据"
+
+# 引用多样性要求
+diversity_requirements:
+  min_total_citations: 8
+  max_total_citations: 15
+  min_categories: 4
+  min_diversity_score: 0.75
+  
+  category_requirements:
+    academic_papers:
+      min: 3
+      weight: 0.40
+      required: false
+      description: "学术论文（期刊、会议、预印本）"
+      
+    government_reports:
+      min: 1
+      weight: 0.15
+      required: false
+      description: "政府/官方机构报告"
+      
+    official_data:
+      min: 1
+      weight: 0.15
+      required: false
+      description: "官方数据源引用"
+      
+    problem_references:
+      min: 1
+      weight: 0.15
+      required: true  # 必须引用题目
+      description: "MCM/ICM题目及附带数据"
+      
+    other_sources:
+      min: 0
+      weight: 0.15
+      required: false
+      description: "其他来源（新闻、技术文档等）"
+
+# 搜索策略配置
+search_strategy:
+  # 多轮搜索
+  rounds:
+    - name: "广度搜索"
+      parallel: true
+      queries:
+        - "{topic} academic research papers"
+        - "{topic} government report statistics"
+        - "{topic} mathematical model methodology"
+        
+    - name: "深度搜索"
+      parallel: true
+      queries:
+        - "{author} related work publications"
+        - "{institution} {topic} report"
+        - "{topic} case study application"
+        
+    - name: "补充搜索"
+      parallel: false
+      condition: "diversity_score < 0.75"
+      queries:
+        - "{topic} {missing_category} source"
+        
+  # 关键词扩展
+  keyword_expansion:
+    academic_suffixes:
+      - "mathematical model"
+      - "optimization algorithm"
+      - "simulation study"
+      - "systematic review"
+      
+    government_keywords:
+      - "government report"
+      - "policy document"
+      - "official statistics"
+      - "white paper"
+      
+    data_keywords:
+      - "World Bank data"
+      - "UN statistics"
+      - "OECD indicators"
+
+# 领域特定配置
+domain_specific:
+  energy:
+    sources: ["DOE", "IEA", "NREL", "EPA"]
+    keywords: ["renewable", "solar", "wind", "energy efficiency"]
+    
+  health:
+    sources: ["CDC", "WHO", "NIH", "FDA"]
+    keywords: ["epidemiology", "public health", "disease"]
+    
+  economics:
+    sources: ["IMF", "World Bank", "Fed", "BLS"]
+    keywords: ["GDP", "inflation", "unemployment", "trade"]
+    
+  environment:
+    sources: ["EPA", "UNEP", "IPCC", "NOAA"]
+    keywords: ["climate", "pollution", "sustainability"]
+    
+  social:
+    sources: ["Census", "UN", "OECD", "Pew"]
+    keywords: ["population", "demographics", "inequality"]
