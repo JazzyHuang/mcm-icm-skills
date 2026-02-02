@@ -1,0 +1,1200 @@
+\documentclass{mcmthesis}
+\mcmsetup{CTeX = false,   % 使用 CTeX 套装时，设置为 true
+        tcn = 123456, problem = F,
+        sheet = true, titleinsheet = true, keywordsinsheet = true,
+        titlepage = false, abstract = true}
+% \usepackage{newtxtext,newtxmath}
+\usepackage{palatino}
+\usepackage{lipsum}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{subfig}
+\usepackage{mdframed}
+% \usepackage{amsmath}
+% \usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{multirow} % 用于合并单元格
+\usepackage{makecell} % 用于换行单元格
+\usepackage{amsmath}  % 用于数学符号
+\usepackage{array}    % 用于自定义列格式
+\usepackage{ragged2e} % 用于文本对齐
+\usepackage{geometry} % 调整页面边距以适配内容
+\geometry{a4paper, margin=1in}
+
+\setlength{\parindent}{2em}
+\makeatletter
+\renewcommand\@cite[1]{\textsuperscript{[#1]}}
+\makeatother
+
+\title{Changing rules on the virtual battlefield}
+% 这一段是备忘录部分，如果题目没有让写备忘录 或者书信 可以不要
+% \author{\small \href{http://www.latexstudio.net/}
+%   {\includegraphics[width=7cm]{mcmthesis-logo}}}
+% \date{\today}
+
+%  \memoto{\LaTeX{}studio}
+% \memofrom{Liam Huang}
+% \memosubject{Happy \TeX{}ing!}
+% \memodate{\today}
+% %\memologo{\LARGE I'm pretending to be a LOGO!}
+
+\begin{document}
+\begin{abstract}
+\setlength{\parskip}{2pt}
+
+As the digitalization process accelerates, cybercrime has become a transnational
+threat. Although countries have successively introduced cybersecurity policies, due to
+differences in implementation time, resource allocation and national conditions, there
+is an urgent need to quantify policy effectiveness and identify best practices through
+data-driven methods. This problem aims to reveal the global distribution of cyber-crime,
+evaluate the heterogeneous effects of policies in various countries, and analyze
+the association mechanism between demographic factors and crime risks, so as to pro-vide
+policymakers with a data-driven optimization path.
+
+For Task 1, in order to explore the distribution of cybercrime, ﬁrst collect data and
+clean the data, and then observe the distribution of cybercrime through visualization.
+It is found that high-incidence areas of cybercrime activities often roughly overlap with
+areas with low GCI scores. Then, a VBGMM model is established to cluster countries
+with the same attributes and ﬁnally divide them into victim countries and attacking
+countries. Finally, a multi-level analysis model based on unordered multi-classiﬁcation
+Logistics regression is constructed. It is found that the success of cybercrime often oc-curs
+in areas with complex hacker activities, insufﬁcient technical support and low in-ternational
+cooperation, while the thwarting of crimes is mainly seen in environments
+with close cooperation and advanced technology. Asset-rich regions are more inclined
+to report attacks, while countries with sound legal systems provide effective support,
+which enhances the prosecution effect of cybercrime.
+
+For Task 2, in order to evaluate the impact of policies on cybercrime, a multi-period
+double difference model was established, and parallelism and placebo tests were con-ducted
+to analyze the heterogeneous impact of the ﬁve dimensions of policies on the
+crime rates of the attacking and victim countries, and ﬁnally the policy effects of legal
+improvement and technology investment were signiﬁcant. In order to analyze the time
+of implementation of cybersecurity policies in various countries and the temporal dy-namics
+of their impact on cybercrime, a survival analysis model was established, and it
+was found that for victim countries, policy implementation and duration signiﬁcantly
+reduced the risk of cybercrime.
+
+For Task 3, in order to analyze the association mechanism between demographic
+data of different countries and cybercrime, a structural equation model was established
+and a ﬁtness test was conducted. According to the model analysis, countries with
+high Internet penetration rates and high education levels among victim countries are
+more likely to become targets of cybercrime, while cybercrime in attacking countries
+is mainly driven by technical capabilities and organizational levels, and the impact of
+demographic factors is not signiﬁcant. 
+
+\begin{keywords}
+VBGMM; DID Model; Cox TVPH; SEM
+\end{keywords}
+\end{abstract}
+\maketitle
+\vspace{-1.2em}
+%% Generate the Table of Contents, if it's needed.
+ \tableofcontents
+ \newpage
+%%
+%% Generate the Memorandum, if it's needed.
+
+
+%%\section为一级标题，\subsection为二级标题 \subsubsection为三级标题
+
+\section{Introduction}
+% \begin{itemize}……\end{itemize}为列表文本
+\lipsum[2]
+\begin{itemize}
+% \item为要点强调，表现为黑色圆点
+\item minimizes the discomfort to the hands, or 
+\item maximizes the outgoing velocity of the ball.
+\end{itemize}
+We focus exclusively on the second definition.
+\begin{itemize}
+\item the initial velocity and rotation of the ball,
+\item the initial velocity and rotation of the bat,
+\item the relative position and orientation of the bat and ball, and
+\item the force over time that the hitter hands applies on the handle.
+\end{itemize}
+\par
+\lipsum[3]
+\begin{itemize}
+\item the angular velocity of the bat,
+\item the velocity of the ball, and
+\item the position of impact along the bat.
+\end{itemize}
+\par
+\lipsum[4]
+% 下述几种格式的效果可以去PDF里查看应用
+\emph{center of percussion} [Brody 1986], \lipsum[5]
+\begin{Theorem} \label{thm:latex}
+\LaTeX
+\end{Theorem}
+\begin{Lemma} \label{thm:tex}
+\TeX .
+\end{Lemma}
+\begin{proof}
+The proof of theorem.
+\end{proof}
+\begin{figure*}[ht]
+  \centering
+    \subfloat[subcaption1]{\includegraphics[width = 0.3\textwidth]{mcmthesis-logo.pdf}}
+    \hfill
+    \subfloat[subcaption2]{\includegraphics[width = 0.3\textwidth]{mcmthesis-aaa-eps-converted-to.pdf}}
+    \hfill
+    \subfloat[subcaption3]{\includegraphics[width = 0.3\textwidth]{mcmthesis-aaa.eps}} 
+  \caption{caption}
+  \label{fig:label}
+\end{figure*}
+  
+\subsection{Problem Background}
+
+With the popularization of Internet technology, global connections are becoming in-creasingly
+close, which not only improves communication efﬁciency, but also provides
+opportunities for cybercrime and increases the security threats faced by individuals
+and organizations. Many cybersecurity incidents cross national borders, making in-vestigations
+more difﬁcult. In order to protect their own image, some organizations
+choose to conceal the fact that they have been hacked. Although this can avoid neg-ative
+publicity in the short term, it weakens the overall awareness and response ca-pabilities
+of society to cybersecurity threats. Therefore, countries need to unite and
+formulate comprehensive national cybersecurity policies based on their own charac-teristics
+to strengthen the cybersecurity protection system.
+\begin{itemize}
+\item
+\item
+\item
+\item
+\end{itemize}
+\par
+\lipsum[7]
+
+\begin{algorithm}
+  \caption{111}
+  \begin{algorithmic}[1]
+  \State $\text{Lambda} \gets 0.04$
+  \State $\text{dr}_0 \gets 0.2$
+  \State $t|\text{NR} \gets 0$
+  \State $i \gets 0$
+  \While{$i < n$}
+      \State $r \gets \Call{Random}$
+      \State $p \gets \Call{Exponential}{\text{Lambda}, t|\text{NR}}$
+      \If{$r \leq p$}
+          \State $\text{day}_\text{n} \gets \Call{RandomDays}$
+          \For{$j \gets 1$ \textbf{to} $\text{day}_\text{n}$}
+              \State $\text{dr}_j \gets 0.15 \cdot r + 0.6$
+          \EndFor
+      \Else
+          \State $\text{dr} \gets \text{dr}_0$
+          \State $t|\text{NR} \gets t|\text{NR} + 1$
+      \EndIf
+      \State $i \gets i + 1$
+  \EndWhile
+  \end{algorithmic}
+  \end{algorithm}
+
+\subsection{Restate of the Problem}
+
+Considering the background information and constraints, developing a National
+Security Doctrine to solve the following problems:
+
+1. Analyze the global distribution of cybercrime, identify high-risk countries, and de-termine
+where cybercrime is successful, disrupted, reported, and prosecuted.
+
+2. Modeling over time to determine which parts of a policy or law are effective or
+ineffective in addressing cybercrime.
+
+3. Identify countries where demographic data is signiﬁcantly correlated with the dis-tribution
+of cybercrime and explain how this supports or challenges established the-ories
+\subsection{Our Work}
+To solve the problem, we built and optimized the entire model:
+
+For Task 1, we collected and processed data, observed the distribution of cyber-crime
+through visualization, and analyzed the characteristics of countries by cluster-ing
+them into attacking countries and victim countries in order to ﬁnd high targets
+of cybercrime. We also built a multi-level analysis model based on unordered multi-classiﬁcation
+logistic regression to analyze the law of cybercrime.
+
+For Task 2, we ﬁrst considered the effectiveness of the policy, and discussed the
+effectiveness of the ﬁve aspects of the policy on the cybercrime rate of the attacking
+country and the victim country by building a multi-period double difference model.
+Then, in order to explore the impact of the time of policy adoption on cybercrime, we
+established Cox’s time varying proportional hazard model.
+
+For Task 3, we introduced the indicator of demographic data and built a structural
+equation model to explore the correlation between cybercrime data and demographic
+data in different countries.
+
+Finally, we conducted a sensitivity analysis on the model
+\begin{figure}[h]
+\small
+\centering
+\includegraphics[width=12cm]{mindmap.png}
+\caption{Mind Map} \label{fig:aa}
+\end{figure}
+
+\section{Assumptions and Justifications}
+\begin{itemize}
+\item Demographic characteristics (such as education index, GDP, human develop-ment
+index, etc.) have a signiﬁcant nonlinear impact on the occurrence of cy-bercrime.
+
+Reason:Education level, economic investment, comprehensive development,
+etc. are related to cybersecurity awareness and capabilities, resource allocation,
+etc., and the relationship is complex.
+\item The impact of each dimension of the GCI index on the occurrence of cybercrime
+has different weights.
+
+Reason: The impact of policies and laws, technical facilities, education and train-ing,
+international cooperation, etc. on cybercrime in different regions and situa-tions
+varies in terms of intensity and mode.
+\item There is a threshold effect on the impact of Internet penetration and mobile device
+usage on cybercrime.
+
+Reason: The Internet and mobile devices are the main platforms for cybercrime,
+but their impact may not be linear. In the early stage, with the popularization
+of the Internet and mobile devices, cybercrime may increase due to the increase
+in users, but when it reaches a certain saturation, the growth rate of cybercrime
+may slow down or decline due to factors such as increased security awareness
+and strengthened protective measures.
+\item The impact of economic factors (such as GDP) on the occurrence of cybercrime is
+interactive.
+
+Reason: GDP not only affects the investment in cybersecurity resources and the
+level of technological development, but also interacts with other economic-related
+factors such as education level and employment status to jointly inﬂuence the
+motivation, opportunities and capabilities of cybercrime.
+\end{itemize}
+% 
+\begin{figure}[h]
+\small
+\centering
+\includegraphics[width=12cm]{mcmthesis-aaa.eps}
+\caption{aa} \label{fig:aa}
+\end{figure}
+
+\lipsum[8] \eqref{aa}
+\begin{equation}
+  \left[\begin{array}{c}
+    \dot{X} \\
+    \dot{Y} \\
+    \dot{Z}
+    \end{array}\right]=\left[\begin{array}{ccc}
+    \cos \phi & -\sin \phi & 0 \\
+    \sin \phi & \cos \phi & 0 \\
+    0 & 0 & 1
+    \end{array}\right]\left[\begin{array}{ccc}
+    \cos \theta & 0 & \sin \theta \\
+    0 & 1 & 0 \\
+    -\sin \theta & 0 & \cos \theta
+    \end{array}\right]\left[\begin{array}{ccc}
+    1 & 0 & 0 \\
+    0 & \cos \psi & -\sin \psi \\
+    0 & \sin \psi & \cos \psi
+    \end{array}\right]\left[\begin{array}{c}
+    \dot{x} \\
+    \dot{y} \\
+    \dot{z}
+    \end{array}\right]
+\end{equation}  
+% \begin{equation}……\end{equation} 这种形式可以实现右编号
+\begin{equation}
+a^2 \label{aa}
+\end{equation}
+% \[   \]这种形式无编号
+\[
+  \begin{pmatrix}{*{20}c}
+  {a_{11} } & {a_{12} } & {a_{13} }  \\
+  {a_{21} } & {a_{22} } & {a_{23} }  \\
+  {a_{31} } & {a_{32} } & {a_{33} }  \\
+  \end{pmatrix}
+  = \frac{{Opposite}}{{Hypotenuse}}\cos ^{ - 1} \theta \arcsin \theta
+\]
+\lipsum[9]
+
+\[
+  p_{j}=\begin{cases} 0,&\text{if $j$ is odd}\\
+  r!\,(-1)^{j/2},&\text{if $j$ is even}
+  \end{cases}
+\]
+
+\lipsum[10]
+
+\[
+  \arcsin \theta  =
+  \mathop{{\int\!\!\!\!\!\int\!\!\!\!\!\int}\mkern-31.2mu
+  \bigodot}\limits_\varphi
+  {\mathop {\lim }\limits_{x \to \infty } \frac{{n!}}{{r!\left( {n - r}
+  \right)!}}} \eqno (1)
+\]
+
+\section{Notations}
+\begin{table}[htbp]
+\centering
+\caption{Notations and Definitions}
+\label{tab:notation}
+\begin{tabular}{ll}
+\toprule
+\textbf{Notations} & \textbf{Definition} \\
+\midrule
+$h(t \mid x)$ & The instantaneous risk of the covariate $x$ \\
+$b_0(t)$ & Baseline hazard rate \\
+$Z_i \ (i = 1, 2, 3, 4, 5)$ & Five aspects of policy \\
+$X_i \ (i = 1, 2, 3, 4)$ & Factors that measure cybercrime \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Data Pre-processing}
+\subsection{Data Collection}
+
+\begin{table}[H]
+\centering
+\caption{Data Sources}
+\label{tab:notation}
+\begin{tabular}{ll}
+\toprule
+\textbf{Database Name} & \textbf{Database Website} \\
+\midrule
+Cybercrime Data & https://verisframework.org/index.html \\
+National Policies Data & https://www.itu.int/en/ITU-D/Cybersecurity/Pages/CIRTs/ \\
+ & List-of-National-CIRTs.aspx\\
+Demographic Statistics & https://databank.worldbank.org/home \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data Cleaning}
+For any feature, if the proportion of NA or "UNKNOWN" in the feature exceeds
+10%, then remove the feature.
+
+For any Boolean type feature, if the proportion of False values âA˘ Nâ´ A˘ Nexceeds ´
+90%, consider whether to remove the feature. This step needs to be decided based on
+the speciﬁc analysis purpose, because sometimes even a large proportion of False may
+contain important information.
+
+For the remaining features with missing values, use linear interpolation to ﬁll them.
+
+For categorical variables (non-numeric variables), use one-hot encoding to convert
+them to numerical variables. One-hot encoding converts each categorical value into a
+new binary column (0 or 1), where each column represents a possible category. This
+encoding method helps machine learning algorithms better process and understand
+categorical data.
+
+\section{Task1: Multi-level cybercrime risk assessment and response model}
+\subsection{Data Visualization}
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{map1.png}
+\caption{Number of crimes reported worldwide from 2005 to 2024} \label{fig:aa}
+\end{figure}
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{map2.png}
+\caption{2024 GCI Chart} \label{fig:aa}
+\end{figure}
+
+Figure 2 shows the high incidence of cybercrime around the world, with particularly
+signiﬁcant clusters in North America and Western Europe. The extreme values
+appear in the United States, and the changes in color and height reﬂect the frequency
+and success rate of cybercrime. Some Southeast Asian countries also show high
+criminal activity. Figure 3 reﬂects the global cybersecurity score. North America, Europe
+and some East Asian countries have high scores, indicating their investment and
+policy support in cybersecurity. High incidence areas of cybercrime activities often
+overlap with areas with low GCI scores. For example, Africa and some South Asian
+countries not only face low cybersecurity scores, but also report high cybercrime rates.
+This shows that there is a direct proportional relationship between cybercrime and inadequate
+cybersecurity strategies.
+
+\subsection{Variational Bayesian Gaussian Mixture Clustering}
+\subsubsection{Principal component analysis dimensionality reduction}
+
+By searching the VERIS community database, we found that there are 136 indicators
+related to cybercrime attacking countries and 825 indicators related to cybercrime
+victim countries. Considering that when the number of features is very large, model
+training may become complicated and the computational cost is very high, and in
+order to remove redundant information, principal component analysis is performed
+on the indicator data to reduce the dimensionality, and it is ensured that the selected
+principal components can explain at least 90\% of the variability in the original data,
+thereby reducing the attacking country indicator to 8 dimensions and the victim country
+indicator to 12 dimensions.
+
+\subsubsection{Clustering process and results}
+
+The reason for choosing the variational Bayesian Gaussian mixture model (VBGMM)
+for clustering is mainly based on the high complexity and dimensionality of the
+data. First, whether it is 8 dimensions or 12 dimensions, it still seems high for the processed
+data set, and VBGMM is good at processing high-dimensional data and effectively
+avoids overﬁtting problems through its internal mechanism, which is especially
+important for data after dimensionality reduction, ensuring that the effectiveness and
+accuracy of clustering results are maintained while simplifying the data structure. Secondly,
+due to the lack of prior knowledge about the optimal number of clusters, VBGMM
+can adaptively determine the most appropriate number of clusters based on the
+intrinsic distribution characteristics of the data, without pre-setting a ﬁxed number of
+clusters, which is particularly critical for exploring data sets with unknown structures.
+In addition, considering that samples may be distributed on the boundaries between
+multiple clusters, VBGMM provides a probability-based method to assign samples to
+each cluster. This soft assignment method not only better reﬂects the true distribution
+of the data, but also increases the understanding of data uncertainty. Finally, the regularization
+effect introduced by VBGMM helps to improve the generalization ability of
+the model, which is particularly suitable for data sets with relatively small sample sizes
+but rich features. In summary, given the high complexity and high dimensionality of
+the data and the uncertainty requirements for the number of clusters, it is reasonable
+to choose VBGMM for clustering.
+
+Since VBGMM assumes that the data is drawn from a multivariate normal distribution,
+it is helpful to standardize the data to zero mean and unit variance. This ensures
+that all features are on the same scale and avoids some features having a disproportionate
+impact on the clustering results due to their large dimensions.
+
+Since the clustering assumption of VBGMM is that the data satisﬁes a multivariate
+normal distribution, it is necessary to consider applying a transformation (such as the
+Yeo-Johnson transformation) to make it closer to a normal distribution.
+
+The clustering results obtained using the algorithm in Table 3 are visualized as
+shown in Figure 4.
+
+For each subcategory, ﬁnd the 5 most important features as the representative features
+of the category and name them as shown in Figure 5
+
+\begin{table}[H]
+\centering
+\caption{Survival EM Algorithm}
+\label{tab:survival_em}
+\begin{tabular}{|p{0.9\textwidth}|} % 单列宽度适配文本
+\hline
+\textbf{Initialize:} \\
+$t \leftarrow 0$ \\
+$\boldsymbol{\theta}^{(t)} \leftarrow \boldsymbol{\theta}^0$ \\
+$\text{converged} \leftarrow \text{false}$ \\
+\hline
+\textbf{While} not converged and $t < \text{maxIter}$ \textbf{do:} \\
+\quad \textit{E-Step:} Compute Expectation of the complete-data log-likelihood \\
+\quad $Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)}) \leftarrow 0$ \\
+\quad For $i = 1$ to $n$ do: \\
+\quad \quad If $\delta_i = 1$ then: // Complete data \\
+\quad \quad \quad $Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)}) \leftarrow Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)}) + \log f(x_i|\boldsymbol{\theta})$ \\
+\quad \quad Else: // Censored data \\
+\quad \quad \quad $Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)}) \leftarrow Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)}) + \log S(x_i|\boldsymbol{\theta})$ // Contribution from censored observation \\
+\quad \quad End If \\
+\quad End For \\
+\quad \textit{M-Step:} Maximize $Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)})$ with respect to $\boldsymbol{\theta}$ \\
+\quad Solve $\frac{\partial Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)})}{\partial \boldsymbol{\theta}} = 0$ for $\boldsymbol{\theta}$ to get $\boldsymbol{\theta}^{(t+1)}$ \\
+\quad // Check Convergence \\
+\quad If $||\boldsymbol{\theta}^{(t+1)} - \boldsymbol{\theta}^{(t)}|| < \epsilon$ or $|L(\boldsymbol{\theta}^{(t+1)}) - L(\boldsymbol{\theta}^{(t)})| < \epsilon$ then: \\
+\quad \quad $\text{converged} \leftarrow \text{true}$ \\
+\quad End If \\
+\quad $t \leftarrow t + 1$ \\
+\quad $\boldsymbol{\theta}^{(t)} \leftarrow \boldsymbol{\theta}^{(t+1)}$ \\
+End While \\
+Return $\boldsymbol{\theta}^{(t)}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{clustering.png}
+\caption{Clustering of attacking and victim countries} \label{fig:aa}
+\end{figure}
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{clustering_type.png}
+\caption{Clustering Type} \label{fig:aa}
+\end{figure}
+
+\subsection{Multi-level analysis model based on unordered multi-classiﬁcation
+logistics regression}
+When studying the success and failure, reporting and prosecution of cybercrime,
+we tend to consider the characteristics of global interconnection and focus on how to
+promote international cooperation rather than just focusing on the opposing classiﬁcations
+between countries. This can better understand the dynamic characteristics of
+cybercrime, so we will not discuss them separately by country type here, but take a
+uniﬁed study to summarize the rules.
+
+In order to comprehensively consider and link factors at different levels, by integrating
+speciﬁc case analysis at the micro level with factors such as policy environment
+and international cooperation at the macro level, we can better understand the
+dynamic changes and rules of cybercrime. A multi-level analysis model is established
+here.
+
+The ﬁrst-level model focuses on the results of speciﬁc cybercrime events and tries
+to ﬁnd out which factors directly affect these results.
+
+Since there are four categories of dependent variables and there is no natural order
+between these states, an unordered multi-classiﬁcation logistic regression model is
+constructed at the ﬁrst level. Here, the types of physical attacks, the security of different
+types of assets, the carriers or ways of risk occurrence, and hacker attack methods
+are selected as inﬂuencing factors.
+
+The second-level model focuses on higher-level factors, aiming to explore why different
+countries or regions have different results in dealing with cybercrime. Referring
+to the evaluation criteria of the GCI index, the ﬁve major aspects of law, technology,
+organization, capacity building and cooperation are used to measure the policies of
+each country, and according to the relevant indicators of each aspect listed by the International
+Telecommunication Union, data is collected and the scores of each aspect
+are obtained by quantitative synthesis.
+
+In order to ensure the independence of the independent variables in the regression
+model, the coefﬁcient estimation instability, standard error increase and signiﬁcance
+test result distortion caused by the high correlation between the independent variables
+are avoided, so as to ensure the accuracy and explanatory power of the model. Before constructing the model, it is necessary to conduct a collinearity test on each layer of
+variables. The variance inﬂation factor is less than 10, which is within a reasonable
+range.
+
+Applying the above theory, the model equation is constructed as follows:
+
+First layer:
+\setcounter{equation}{0} %
+\begin{align}
+\log\left(\frac{P(Y=1)}{P(Y=0)}\right) &= \beta_1 - 6.684 \times X_1 + 2.593 \times X_2 - 11.348 \times X_3 - 6.405 \times X_4 \\
+\log\left(\frac{P(Y=2)}{P(Y=0)}\right) &= \beta_2 - 0.698 \times X_1 + 11.218 \times X_2 - 16.351 \times X_3 - 11.562 \times X_4 \\
+\log\left(\frac{P(Y=3)}{P(Y=0)}\right) &= \beta_3 - 0.473 \times X_1 - 0.348 \times X_2 + 0.828 \times X_3 - 0.131 \times X_4
+\end{align}
+
+Among them, $Y=0,1,2,3$ represents the four results of cybercrime success, thwarted, reported and prosecuted, $X_i(i=1,2,3,4)$ represents the four influencing factors of physical attack type, security of different types of assets, carrier or path of risk occurrence, and hacker attack method, $\beta_i(i=1,2,3)$ corresponds to the three results of cybercrime thwarted, reported, and prosecuted.
+
+Second layer:
+
+\begin{align}
+\beta_1 &= 0.337 + 0.324 \times Z_1 + 0.087 \times Z_2 - 0.288 \times Z_3 + 0.035 \times Z_4 - 0.147 \times Z_5 \\
+\beta_2 &= -0.062 + 0.245 \times Z_1 + 0.051 \times Z_2 - 0.147 \times Z_3 + 0.044 \times Z_4 - 0.121 \times Z_5 \\
+\beta_3 &= 0.429 + 0.141 \times Z_1 + 0.048 \times Z_2 - 0.182 \times Z_3 + 0.719 \times Z_4 - 0.259 \times Z_5
+\end{align}
+
+Among them, $Z_i(i=1,2,3,4,5)$ represents the five factors of law, technology, organization, capacity building and cooperation.
+
+Analyzing the results of the above model, we can summarize the laws of cybercrime
+as follows:
+\begin{itemize}
+\item Where cybercrime is successful: characterized by highly sophisticated hacker activity,
+fewer assets exposed to potential attackers, low levels of international cooperation,
+and insufﬁcient technical support. These characteristics provide cybercriminals
+with a relatively loose operating space.
+\item Where cybercrime is thwarted: characterized by high levels of cooperation (international
+or regional), advanced technological development, and a strong focus
+on cybersecurity, while avoiding over-reliance on legal means. This means taking
+more direct and technical defensive measures to prevent and respond to cyberattacks.
+\item Where cybercrime is reported: characterized by having more assets, even in the
+face of strong hacker attacks, they may choose to report rather than conceal because
+they have better error management mechanisms. This suggests that in
+asset-rich environments, organizations and individuals may be more willing to
+publicly acknowledge attacks and seek external assistance to solve problems.
+\item  Where cybercrime is prosecuted: characterized by the degree of sophistication of
+technical infrastructure and the effectiveness of the legal system play a decisive
+role, especially when a country or region’s legal system can effectively support
+the investigation and trial process of cybercrime. This can greatly increase the
+possibility of bringing criminals to justice.
+\end{itemize}
+
+\section{Task2:Cybersecurity policy effectiveness evaluation model}
+\subsection{Multi-period double difference model}
+\subsubsection{Composite Sampling}
+Since countries can be divided into countries that attack cybercrime and countries
+that are victims, and these two categories of countries face different challenges and
+needs in cybercrime, they should be discussed separately so as to adopt targeted strategies.
+Considering that victim countries and attacking countries are divided into
+three categories according to various characteristics, and the number of countries in
+each category is different, a mixed sampling method is used to select representative
+countries from each category for research (the formula is as follows), ensuring that
+representative samples are drawn from each category in proportion and a ﬁxed number
+of samples are added to each category. This method not only ensures that the large
+categories are sufﬁciently representative, but also allows small categories to receive
+full attention due to their uniqueness, thereby improving the overall diversity of the
+sample and the accuracy of the research results.
+
+\begin{equation}
+n_i = \left\lfloor \frac{C_i}{\sum_{j=1}^m C_j} \times (N - n \times k) \right\rfloor + k
+\end{equation}
+
+Where $N$ is the total number of samples drawn, where $N=30$, $n_i$ represents the total number of samples selected from the $i$th cluster, $k$ represents the number of additional fixed samples selected from each cluster, where $k=5$, $C_i$ represents the total number of countries in the $i$th cluster, $m$ represents the number of clusters, where $m=3$.
+
+The design takes 30 victim countries and attacking countries for research respectively,
+and uses the above mixed sampling method to obtain 18, 6, and 6 representative
+countries for the three subcategories of victim countries, and 7, 17, and 6 representative
+countries for the three subcategories of attacking countries for targeted and speciﬁc research.
+\subsubsection{Model construction}
+Since the global cybercrime governance policy is implemented in stages and there
+are differences in the implementation time of the policy, a multi-period double difference
+model is constructed based on econometric theory and research methods to
+empirically analyze the inhibitory effect of cybercrime governance policies on the situation
+of cybercrime around the world, and further explore the relationship between
+various policy indicators and cybercrime. The panel data selected data from 2005 to
+2022 for 18 years, in which the experimental group and the control group respectively
+covered different countries and regions of cybercrime attacking countries and victim
+countries. In order to improve and ensure the accuracy of the research and the accuracy
+of the data, the sample data of individual countries with serious data missing were
+
+
+
+\begin{table}[H]
+\centering
+\caption{Selection of Representative Countries}
+\label{tab:representative_countries}
+\small % 调整字体大小以适配表格宽度
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.3\textwidth} >{\raggedright\arraybackslash}p{0.6\textwidth}}
+\toprule[1pt]
+\textbf{Country Type} & \textbf{Representative Countries} \\
+\midrule
+Security & UZ, MA, RS, BW, GH, GR, TN, TL, KH, GT, MZ, ME, IQ \\
+Vulnerabilities and Equipment Issues & SI, MR, DZ, KW, TZ \\
+\midrule
+Software Issues and Service Disruptions & SE, HK, SG, NL, ID, VE \\
+\midrule
+Financial Losses and Business Impact & FR, BE, AE, IE, ZA, TW \\
+\midrule
+Motivation-driven Attacks & IN, ID, VN, NZ, KR, CA, UA \\
+\midrule
+Physical Attacks and Control Breaches & VE, JO, AZ, MY, CL, EG, TN, MR, PH, SG, AF, LY, JP, IT, IS, AL, BZ \\
+\midrule
+Hacker Techniques and Advanced Attacks & IR, PK, TR, SY, AR, CN \\
+\bottomrule[1pt]
+\end{tabular}
+\end{table}
+\noindent eliminated. Finally, 60 countries (30 attacking countries and 30 victim countries) were
+used as research samples to explore the impact of the implementation of cybercrime
+governance policies on the situation of cybercrime and the driving effect of different
+policies on the cybercrime prevention and control capabilities of surrounding countries.
+The multi-period DID model constructed in this paper is as follows:
+
+\begin{equation}
+crime_{it} = \alpha - \beta_1 \times did_{it} + \beta_2 \times post_{it} + u_i + \lambda_t + \varepsilon_{it}
+\end{equation}
+
+In the above formula, $i$ represents the country, $t$ represents the year; $crime_{it}$ is the explained variable, i.e., the cybercrime rate of country $i$ in year $t$; $\alpha$ is the constant term; $\beta_1$ is the policy effect, $did_{it}$ is the core explanatory variable, which is the interaction term of the country dummy variable and the time dummy variable, and is used to represent the dummy variables of different GCI indicators; $\beta_2$ is the coefficient, $post_{it}$ is the control variable at the cybercrime level; $u_i$ represents the fixed effect of country $i$, $\lambda_t$ represents the time fixed effect of year $t$; $\varepsilon_{it}$ is the random disturbance term of the multi-period DID regression model.
+
+\subsubsection{Parallel trend test}
+Before using the multi-period DID method for analysis and testing, ensure that the
+time trends of the cybercrime rates of the treatment group and the control group are
+basically parallel, and there is no signiﬁcant difference. Based on the above work,
+we ﬁrst conduct a parallel test, taking the legal aspect of the attacking country as an
+example, the results are as follows:
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{parallel_trend_test.png}
+\caption{Parallel Trend Test} \label{fig:aa}
+\end{figure}
+
+\subsubsection{Model results}
+The model results obtained by solving are as follows:
+
+For the attacking country:
+\begin{align}
+\text{Law: } \quad crime_{it} &= 0.1927 - 0.5413 \times did_{it} + 0.4440 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Technology: } \quad crime_{it} &= 0.3593 + 0.6381 \times did_{it} + 0.3069 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Organization: } \quad crime_{it} &= 0.3152 + 0.327 \times did_{it} + 0.3182 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Capacity Building: } \quad crime_{it} &= 0.2833 - 0.3080 \times did_{it} + 0.4152 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Cooperation: } \quad crime_{it} &= 0.3267 - 0.4958 \times did_{it} + 0.2256 \times post_{it} + u_i + \lambda_t + \varepsilon_{it}
+\end{align}
+
+For the victim country:
+\begin{align}
+\text{Law: } \quad crime_{it} &= 0.3528 - 0.4303 \times did_{it} + 0.5372 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Technology: } \quad crime_{it} &= 0.2493 - 0.3752 \times did_{it} + 0.2638 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Organization: } \quad crime_{it} &= 0.2904 + 0.3995 \times did_{it} + 0.3672 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Capacity Building: } \quad crime_{it} &= 0.3632 - 0.4165 \times did_{it} + 0.6330 \times post_{it} + u_i + \lambda_t + \varepsilon_{it} \\
+\text{Cooperation: } \quad crime_{it} &= 0.2691 - 0.5297 \times did_{it} + 0.5285 \times post_{it} + u_i + \lambda_t + \varepsilon_{it}
+\end{align}
+\subsubsection{Placebo test}
+After solving the model and obtaining preliminary results, in order to exclude the
+impact of non-policy factors on cybercrime and avoid subjective changes in the research
+subjects due to advance knowledge of the policy implementation signal, which
+may lead to errors in the "policy effect", the following placebo test is conducted:
+
+\begin{figure}[H]
+\small
+\centering
+\includegraphics[width=12cm]{placebo_test.png}
+\caption{Placebo test} \label{fig:aa}
+\end{figure}
+The kernel density distribution of the placebo test results is shown in the ﬁgure. It
+can be seen that the p value distribution is close to the normal distribution, and the
+regression result is not signiﬁcant, indicating that the impact of the implementation
+of legal policies on cybercrime governance on the attacking country is not accidental,
+which further veriﬁes the robustness of the model.
+
+\subsubsection{Result Analysis}
+After solving the multi-period DID model of the degree of inﬂuence of policies on
+cybercrime in the attacking country and the victim country, the following radar chart
+about $\beta_1$ (policy effect) is drawn:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{radar.png}
+\caption{$\beta_1$ Policy Effect Radar Chart} \label{fig:aa}
+\end{figure}
+
+By evaluating the impact of different countries’ policies on cybercrime in ﬁve dimensions,
+the effectiveness of national policies in cybersecurity is intuitively demonstrated.
+In terms of national strategic priorities, attacking countries may prioritize
+the development of technical defense and legal deterrence to consolidate their dominance
+in cyberspace, while victim countries are forced to selectively ignore certain
+dimensions (such as international cooperation) due to limited resources; in terms of
+data and execution capabilities, high 1 countries usually have more complete cybercrime
+databases and efﬁcient execution agencies, while developing countries with low
+1 countries have data gaps or decentralized agencies, and policy effects are difﬁcult to
+show.
+
+The legal and technical policies of the attacking country can effectively curb the
+occurrence of cybercrime, indicating that it has a complete cybersecurity legal system
+(such as the "Cybersecurity Law" and the "Data Protection Law"), and clariﬁes crossborder
+jurisdiction and criminal liability. Deploy advanced defense technologies (such
+as AI-driven threat detection and quantum encryption), and the protection level of critical
+infrastructure is high; but the policy effectiveness at the capability development
+level is low, indicating that they have strong dependence on international cooperation
+but weak voice, and it is difﬁcult to obtain threat intelligence in a timely manner.
+These countries should avoid technological hegemony and open source their defense
+technologies or license them at low prices to countries in need (such as providing free
+vulnerability scanning tools). The EU can also fund African countries to build security
+infrastructure through the "Digital Europe Plan".
+
+The victim countries’ cooperation policies can effectively curb the occurrence of cybercrime,
+indicating that they may dominate the international cybersecurity alliance
+and share attacker IP and malicious code feature libraries; but the effectiveness of the
+technical level policy is not high, which may be due to the reliance on outdated ﬁrewalls
+and antivirus software and the lack of real-time monitoring capabilities. These
+countries can promote the Zero Trust architecture, force key industries to deploy intrusion detection systems (IDS) or adopt "lightweight" solutions, such as AI-based automated
+threat detection (low cost, high coverage) and other measures to improve the
+effectiveness of policies at the technical level.
+
+Therefore, the attacking country needs to shift from a "technology exporter" to a
+"rule co-builder" to avoid the capability gap that exacerbates the imbalance of global
+cybercrime, while the victim countries should focus on resources to make up for
+shortcomings (such as laws and technology) and obtain external support through international
+cooperation. Only through multi-dimensional policy optimization and innovation
+of cooperation mechanisms can a more balanced and sustainable global cybersecurity
+ecosystem be built.
+
+\subsection{Cox’s time varying proportional hazard model}
+\subsection{principle}
+Since the topic requires analyzing the implementation time of cybersecurity policies in various countries and the time dynamics of their impact on cybercrime, and Cox’s time varying proportional hazard model is a statistical model widely used in survival analysis, especially for dealing with time-dependent covariates, this topic innovatively uses this model for research.
+
+\begin{equation}
+h(t|x) = \underbrace{b_0(t)}_{\text{baseline}} \cdot \underbrace{\exp\left( \sum_{i=1}^{n} \beta_i \left( x_i(t) - \bar{x}_i \right) \right)}_{\substack{\text{log--partial hazard} \\ \text{partial hazard}}}
+\end{equation}
+
+where $h(t|x)$ represents the instantaneous risk (or hazard rate) of a given covariate $x$ at time $t$,
+\begin{itemize}
+    \item $b_0(t)$: baseline hazard rate,
+    \item $\beta_i$: The coefficient of the $i$th covariate, represents the hazard rate when all covariates are zero.
+    \item $x_i(t)$: The value of the $i$th covariate at time $t$
+    \item $\bar{x}_i$: The average value of the $i$th covariate.
+\end{itemize}
+
+\subsection{Hypothesis Testing}
+The most important assumption in the Cox model is the proportional hazard assumption, that is, the effect of covariates on survival time does not change over time. Graphical tests (observing whether the survival curves are parallel) show that the survival probability of the "Rejection" group is higher than that of the "Adoption" group, with the former having a longer median survival time of about 14 years, while the latter has a median survival time of about 14 years. In addition, the Log-rank test ($p = 0.0013 < 0.05$) shows that there is a significant difference in the survival probability between the two groups.
+
+\[
+h(t \mid x) = h_0(t) \exp(-1.33x_1 - 0.61x_2 + 0.16x_3 + 1.01x_4 - 0.06x_5 + 0.06x_6 + 0.54x_7) \tag{20}
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{curve.png}
+\caption{Kaplan-Meier survival curve} \label{fig:aa}
+\end{figure}
+\subsection{Model Building}
+The model equation is established as
+
+For the attacking country:
+\[
+h(t \mid x) = h_0(t) \exp(-1.33x_1 - 0.61x_2 + 0.16x_3 + 1.01x_4 - 0.06x_5 + 0.06x_6 + 0.54x_7) \tag{21}
+\]
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{attack.png}
+\caption{Kaplan-Meier survival curve} \label{fig:aa}
+\end{figure}
+For the victim country:
+\[
+h(t \mid x) = h_0(t) \exp(-0.30x_1 + 0.08x_2 + 0.92x_3 + 0.10x_4 - 0.86x_5 + 0.07x_6 - 0.13x_7) \tag{22}
+\]
+
+where \(x_i (i = 1,2,3,4,5,6,7)\) represents the policy regarding capabilities, cooperation, law, organization, whether the policy is implemented, policy duration, and technology
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{victim.png}
+\caption{Kaplan-Meier survival curve} \label{fig:aa}
+\end{figure}
+
+The Wald test and likelihood ratio test were used to evaluate the signiﬁcance of
+the regression coefﬁcients in the Cox model: the Wald test calculated the z value by
+comparing the regression coefﬁcient with its standard error (absolute value >1.96 indicated
+signiﬁcance at the 0.05 level), while the likelihood ratio test determined whether
+the parameter made a meaningful contribution to the model by calculating the p value
+(<0.05 indicated a signiﬁcant improvement in model ﬁt).
+
+\subsection{Model Analysis}
+For the attacking country, it can be seen from the equation that technology and
+organization contribute more to the occurrence of cybercrime, which means that the
+stronger the technical strength and organizational structure, the higher the probability
+of the attacking country to launch cybercrime. In contrast, capability and cooperation
+play a role in reducing cybercrime. And the duration of the policy slightly increases
+the risk, which may be because attackers ﬁnd ways to bypass the policy over time.
+
+For the victim country, law is one of the most inﬂuential factors, indicating that a
+stronger legal framework may increase the likelihood of reporting or identifying cybercrime
+rather than directly reducing crime. Policy implementation has a signiﬁcant
+effect on reducing cybercrime, which may be because effective policies can prevent
+or combat cybercrime. And the duration of the policy also helps to further reduce
+the risk, indicating that long-term and effective cybersecurity policies can effectively
+prevent cybercrime.
+
+\section{Task3:CyberDemographic Resilience Model}
+In addition to considering the ﬁve aspects of national policies, namely, legal, technical,
+organizational, capacity building and cooperation, demographic data are introduced,
+namely, GDP per capita, number of secure Internet servers, and higher education
+enrollment rate, which shows that cybercrime is jointly affected by multiple
+factors, and there may be complex interactions between these factors. Therefore, a
+structural equation model (SEM) is established, which considers the direct and indirect
+effects between multiple dependent and independent variables at the same time,
+\subsection{Principle}
+The connection between variables in SEM is represented by structural parameters,
+which provide constants for the invariance of causal relationships between variables
+and describe the relationship between observed variables, between observed variables
+and latent variables, and between latent variables. These variables can be summarized
+into two models, namely measurement models and structural models.
+
+1. Measurement Model mainly represents the relationship between observed variables
+and latent variables. The measurement model generally consists of two equations,
+which respectively define the relationship between the endogenous latent variable
+$\eta$ and the endogenous observed variable $y$, and between the exogenous latent
+variable $\xi$ and the exogenous observed variable $x$. The model form is:
+
+\begin{align}
+x &= \Lambda_x \xi + \delta \tag{23} \\
+y &= \Lambda_y \eta + \varepsilon \tag{24}
+\end{align}
+
+Among them, $x$ is a vector composed of exogenous observed variables; $y$ is a vector
+composed of endogenous observed variables; $\Lambda_x$ represents the relationship
+between exogenous observed variables and exogenous latent variables, which is the
+factor loading matrix of exogenous observed variables on exogenous latent variables;
+$\Lambda_y$ represents the relationship between endogenous observed variables and
+endogenous latent variables, which is the factor loading matrix of endogenous observed
+variables on endogenous latent variables; $\delta$ is the measurement error of the
+exogenous observed variable $x$; $\varepsilon$ is the measurement error of the
+endogenous observed variable $y$; $\xi$ and $\eta$ are the latent variables of $x$
+and $y$, respectively.
+
+2. Structural Equation Model mainly represents the relationship between latent
+variables. It stipulates the causal relationship between the assumed exogenous latent
+variables and endogenous latent variables in the system under study, and the model
+form is:
+
+\begin{equation}
+\eta = \beta \eta + \Gamma \xi + \zeta \tag{25}
+\end{equation}
+
+Among them, $\eta$ is the endogenous latent variable; $\xi$ is the exogenous latent
+variable; $\beta$ is the coefficient matrix of the endogenous latent variable $\eta$,
+which is also the path coefficient matrix between endogenous latent variables;
+$\Gamma$ is the coefficient matrix of the exogenous latent variable $\xi$, which is
+also the path coefficient matrix from exogenous latent variables to the corresponding
+endogenous latent variables; $\zeta$ is the residual term, representing the part that
+cannot be explained by the model.
+
+\subsection{Model establishment}
+
+In combination with the research questions, the basic model diagram of each variable
+is established, and by consulting the literature, the policy and demographic data,
+as well as the research hypothesis relationship of cybercrime are determined.
+
+For the victim country:
+
+H1: Policy has a signiﬁcant positive relationship with cybercrime
+
+H2: Demographic data has a signiﬁcant positive relationship with cybercrime
+
+For the attacking country:
+
+H3: Policy has a signiﬁcant positive relationship with cybercrime
+
+H4: Demographic data has a signiﬁcant positive relationship with cybercrime
+
+Based on the above theoretical assumptions, the structural equation model diagram
+that affects cybercrime is constructed with the help of the software AMOS, as shown
+below.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{structure.png}
+\caption{Structural equation model diagram of the impact of cybercrime} \label{fig:aa}
+\end{figure}
+
+\subsection{Fitness test}
+The established model was tested for ﬁtness through AMOS, and the following
+table was obtained (due to space limitations, only the ﬁtness test of the victim country
+is listed, but the attacking country also passed the ﬁtness test).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Victim Country Fit Test}
+  \label{tab:victim-fit}
+  \begin{tabular}{cccc}
+    \toprule[1.2pt]
+    \textbf{Fit Test Index} & \textbf{Fit Standard} & \textbf{Model Result} & \textbf{Fit Evaluation} \\
+    \midrule[0.8pt]
+    CMIN   & 1$\sim$3     & 1.774 & Good \\
+    RMSEA  & $<0.08$      & 0.083 & Acceptable \\
+    RMR    & $<0.08$      & 0.085 & Acceptable \\
+    GFI    & $>0.90$      & 0.927 & Good \\
+    CFI    & $>0.90$      & 0.949 & Good \\
+    IFI    & $>0.90$      & 0.944 & Good \\
+    TLI    & $>0.90$      & 0.985 & Good \\
+    \bottomrule[1.2pt]
+  \end{tabular}
+\end{table}
+
+\subsection{Model analysis}
+According to the victim country model, demographics have a signiﬁcant positive
+impact on cybercrime. Therefore, it can be inferred that among victim countries, countries
+with high Internet penetration, developed economy, and high education level are
+more likely to become targets of cybercrime. For example, developed countries such
+as Canada and South Korea may face more cyberattacks due to their well-developed
+Internet infrastructure and frequent economic activities. In the attacking country model,
+demographics do not have a signiﬁcant predictive effect on cybercrime. This may
+mean that cybercrime in attacking countries is more driven by technical capabilities
+and organizational levels rather than traditional demographic factors. Therefore, attacking
+countries may be those countries that have high Internet penetration and developed
+economy but strong legal and technical defense capabilities, such as China
+and Russia, which may become the source of cyberattacks due to the concentration of
+technical resources.
+
+According to the victim country model, high Internet penetration and education
+level may lead to more cybercrime victims, which supports the theory that "countries
+with high digitalization are more likely to become targets." However, this may also
+confuse the theory because high education level is usually associated with higher cybersecurity
+awareness, but the data show that education level positively affects crime
+victimization, which may be because countries with high education levels use more
+online services, increasing the risk of exposure.
+
+For the attacking countries, the demographic data is not signiﬁcant, which may
+support the theory that "attack behavior relies more on technical and organizational
+factors", but the problems of data quality or indicator selection need to be eliminated.
+For example, the demographic indicators (secure Internet servers, higher education
+enrollment rate) in the attacking country model may not effectively reﬂect the actual
+inﬂuencing factors, and other indicators such as the proportion of technical practitioners
+or dark web activity may need to be introduced.
+
+In view of the cybercrime governance needs of different countries, the following
+policy recommendations are put forward: For the victim countries, the access rights
+to high-value data should be restricted by promoting the Zero Trust architecture to reduce
+the risk of exposure. At the same time, compulsory cybersecurity courses should
+be added in higher education to balance digital convenience and risk awareness, and
+security subsidies should be provided to small and medium-sized enterprises to alleviate
+the problem of insufﬁcient resources, so as to systematically improve defense
+capabilities. For the attacking countries, it is necessary to strictly control the export of
+vulnerability scanning tools and encryption technologies to prevent the abuse of technology,
+require transparent attack tracing through international cooperation mechanisms
+such as the Budapest Convention to increase the cost of crime, and introduce
+alternative indicators such as dark web activity and the number of APT organizations
+to more accurately reﬂect the characteristics of attack behavior. At the international
+level, we should promote the establishment of a uniﬁed cybercrime data reporting
+framework to reduce analytical bias. At the same time, we should establish a global
+cybersecurity fund to support technology transfer and capacity building in developing
+countries, promote cross-border collaboration and technology sharing, and build a
+fairer and more transparent global cyber governance system.
+\section{Analysis on Model’s Sensitivity}
+We used ﬁve factors of national policy and data on cybercrime when constructing
+a multi-level analysis model. However, in actual calculations, due to national statistics
+or publication errors, the data is often inaccurate and ﬂuctuates, which may affect the
+results to a certain extent. Therefore, in order to test whether our model is still stable
+when external conditions are disturbed, we use sensitivity analysis to evaluate our
+model. In order to simulate data ﬂuctuations of different magnitudes, we added 2\%,
+5\% and 10\% disturbances to the data, which were brought into the prediction model
+for calculation and compared with the original situation without disturbance. Here,
+we take the frequency of physical attacks as an example,
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{sensitivity analysis.png}
+\caption{Sensitivity analysis} \label{fig:aa}
+\end{figure}
+By changing the frequency of physical attacks in the multi-layer analysis model,
+we calculate the results of the log-odds ratio, thereby analyzing the sensitivity of the
+factor of physical attack frequency. From the ﬁgure, we can see that with the increase of
+attack frequency, the trend of log-odds ratio changes little, indicating that our equation
+is stable.
+
+\section{Strengths and Weaknesses}
+
+\subsection{Strengths}
+1. The DID model can effectively control unobserved time-invariant characteristics
+and avoid bias introduced by ﬁxed individual effects. And because the model compares
+the time changes of the treatment group and the control group, it can reduce the
+impact of selection bias and extract causal relationships. It is suitable for various types
+of policy evaluation and intervention analysis and can handle different time series
+data.
+
+2. SEM can handle multiple dependencies at the same time and is suitable for analyzing
+direct and indirect effects between variables. Concepts can be represented by
+latent variables (unobserved variables) to improve the explanatory power of the model,
+especially in social science research, which is often used to quantify characteristics
+that are difﬁcult to measure directly.
+
+\subsection{Weaknesses}
+1. Although the DID model can control ﬁxed effects, the model may still be affected
+by unobserved time-varying factors, which may affect both the treatment group and
+the control group. Multi-period DID requires a large amount of panel data to ensure
+the reliability of the results, and data collection and processing may be more complicated.
+And if an exogenous shock occurs during the analysis period (such as an economic
+crisis, an epidemic, etc.), it may affect the results, making causal relationships more
+difﬁcult to identify
+
+2. Structural equation models require a larger sample size to ensure the stability
+and reliability of parameter estimates, and the model assumptions are stricter. SEM
+assumes a linear relationship between variables, which may not apply to all actual
+situations, leading to model bias, and is more sensitive to missing data and outliers,
+which may affect the accuracy of the results.
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+\bibitem{1} Padyab M ,Padyab A ,Rostami A , et al.Cybercrime in Nordic countries: a scoping
+review on demographic, socioeconomic, and technological determinants[J].SN
+Social Sciences,2024,4(11):205-205.
+\bibitem{2} Meiling C ,Yaqin S ,Jinping L , et al.DRKPCA-VBGMM: fault monitoring
+via dynamically-recursive kernel principal component analysis with
+variational Bayesian Gaussian mixture model[J].Journal of Intelligent
+Manufacturing,2022,34(6):2625-2653.
+\bibitem{3} Wang H ,Ge T ,Wang Q , et al.A Mathematical Prediction Model for Postoperative
+Infection Based on Logistic Multiple Regression Analysis in the Assessment
+of Surgical Outcome and Prediction of Infection in Elderly Spinal Fractures[J].Alternative
+Therapies in Health and Medicine,2024,30(7):179-183.
+\bibitem{4} Wang Jin, Li Junyan, Wu Jianlong. The Impact of Big Data Comprehensive Pilot
+Zones on Regional Scientiﬁc and Technological Innovation CapabilityâA˘TPolicy ˇ
+Effect Evaluation Based on Multi-period Difference-in-Differences [J/OL]. Studies
+in Science of Science, 1-21 [2025-01-28].
+\bibitem{5} Parveen K ,Phuc B Q T ,Alghamdi A A , et al.Author Correction: Unraveling
+the dynamics of ChatGPT adoption and utilization through Structural Equation
+Modeling.[J].Scientiﬁc reports,2024,14(1):28208.
+\bibitem{6} \url{http://www.chinatex.org/}
+\end{thebibliography}
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{section}{MEMO}
+\noindent \textbf{\Large MEMO}
+
+\vspace{1em}
+\noindent
+\textbf{To:} ITU Cybersecurity Summit National Leaders \\
+\textbf{From:} Team 2504223 \\
+\textbf{Date:} January 28, 2025 \\
+\textbf{Subject:} National security policy making on cybercrime
+
+\vspace{1em}
+
+\noindent Dear leaders of the country:
+
+We present this memorandum to you with urgency to share our latest research
+results on global cybercrime governance and provide data-driven policy
+recommendations for the upcoming Cybersecurity Summit. As the digitalization
+process accelerates, cybercrime has become a transnational threat. Its
+complexity and concealment make cross-border law enforcement and policy
+coordination difficult, seriously threatening national security and economic
+stability. Although countries have successively introduced cybersecurity
+policies, due to differences in implementation time, resource allocation and
+national conditions, it is urgent to quantify policy effectiveness and identify
+best practices through scientific methods. The policy effect evaluation shows that the improvement of laws and technology
+investment significantly reduce the rate of cybercrime, and the effect is
+significant within 1--2 years after the implementation of the policy. Therefore,
+it is recommended to implement the strategy of ``technical defense first, legal
+deterrence follow-up'' in the terms of demographic correlation factors. Countries
+with high Internet penetration and high education levels are more likely to
+become targets of attacks, while in attacking countries, demographic factors
+(such as economy and education) have no significant impact on attack behavior,
+and the main driving factors are technical capabilities and organizational
+levels. Based on the above findings, the recommendations for victim countries include
+promoting zero-trust architecture to reduce exposure risks, limiting access
+rights to high-value data, and adding cybersecurity courses in higher education,
+while providing security subsidies for small and medium-sized enterprises. For
+attacking countries, it is recommended to strictly control the export of
+vulnerability scanning tools and encryption technologies to prevent the abuse
+of technology, and promote the transparency of attack tracing through
+mechanisms such as the Budapest Convention to increase the cost of crime. At the international level, a global cybersecurity framework such as the
+expansion of VERIS should be established to unify data standards and reduce
+statistical bias, and a capacity building fund should be established under the
+leadership of developed countries to support technology transfer and talent
+training in developing countries. Cybercrime governance must take account of
+differences in national digital risks and shared international responsibilities.
+Victim countries should balance digital risks through technological defense
+and education investment; attacking countries need to replace technological
+hegemony with transparency and cooperation; and the international community
+needs to build an inclusive framework to promote resource sharing and rule-making.
+This concludes our project. Thank you.
+
+\vspace{2em}
+
+\begin{flushright}
+Yours Sincerely,\\
+Team \#2504223
+\end{flushright}
+
+\begin{appendices}
+
+%  备忘录正文部分
+%  \begin{memo}[Memorandum]
+% 	\lipsum[1-3]
+% \end{memo}
+
+\section{First appendix}
+
+\lipsum[13]
+
+Here are simulation programmes we used in our model as follow.\\
+
+\textbf{\textcolor[rgb]{0.98,0.00,0.00}{Input matlab source:}}
+\lstinputlisting[language=Matlab]{./code/mcmthesis-matlab1.m}
+
+\section{Second appendix}
+
+some more text \textcolor[rgb]{0.98,0.00,0.00}{\textbf{Input C++ source:}}
+\lstinputlisting[language=C++]{./code/mcmthesis-sudoku.cpp}
+
+\end{appendices}
+\newpage
+
+\section*{\centering Report on Use of AI}
+\subsection*{OpenAI-GPT5-Thinking}
+\textbf{Query1 :} prompt1  \par
+\textbf{Output1:} 
+\begin{mdframed}[
+    linewidth=2pt,        % 边框线粗细
+    linecolor=black,        % 边框颜色
+    innertopmargin=10pt,    % 框内顶部间距
+    innerbottommargin=10pt, % 框内底部间距
+    innerleftmargin=10pt,   % 框内左侧间距
+    innerrightmargin=10pt,  % 框内右侧间距
+    skipabove=5pt,         % 框上方间距
+    skipbelow=5pt,          % 框下方间距
+    backgroundcolor=gray!20
+]
+AI Output
+\end{mdframed}
+
+
+\end{document}
+
+%% 
+%% This work consists of these files mcmthesis.dtx,
+%%                                   figures/ and
+%%                                   code/,
+%% and the derived files             mcmthesis.cls,
+%%                                   mcmthesis-demo.tex,
+%%                                   README,
+%%                                   LICENSE,
+%%                                   mcmthesis.pdf and
+%%                                   mcmthesis-demo.pdf.
+%%
+%% End of file `mcmthesis-demo.tex'.
+
