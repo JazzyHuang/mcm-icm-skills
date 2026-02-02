@@ -1,0 +1,12 @@
+name: problem-parser
+phase: 1
+execution_mode: llm
+description: |
+  解析美赛题目文本，提取关键信息：问题类型、关键要求、数据文件、约束条件等
+outputs:
+  - parsed_problem
+  - problem_type
+  - problem_requirements
+  - data_files_needed
+timeout: 120
+category: input

@@ -1,0 +1,11 @@
+name: grammar-checker
+phase: 8
+execution_mode: script
+description: 语法检查，LAT评分
+depends_on:
+  - sections
+outputs:
+  - grammar_report
+  - lat_score
+timeout: 120
+category: quality

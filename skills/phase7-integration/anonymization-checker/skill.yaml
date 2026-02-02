@@ -1,0 +1,10 @@
+name: anonymization-checker
+phase: 7
+execution_mode: script
+description: 检查匿名性，确保无身份信息
+depends_on:
+  - sections
+outputs:
+  - anonymization_report
+timeout: 60
+category: integration

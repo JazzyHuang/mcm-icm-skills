@@ -1,0 +1,11 @@
+name: fact-checker
+phase: 5
+execution_mode: script
+description: 事实核查，验证数据和陈述的准确性
+depends_on:
+  - section-writer
+outputs:
+  - fact_check_report
+  - corrections_needed
+timeout: 120
+category: writing

@@ -1,0 +1,11 @@
+name: format-checker
+phase: 7
+execution_mode: script
+description: 检查格式是否符合美赛要求
+depends_on:
+  - latex-compiler
+outputs:
+  - format_report
+  - format_violations
+timeout: 60
+category: integration

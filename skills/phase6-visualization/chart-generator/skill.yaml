@@ -1,0 +1,12 @@
+name: chart-generator
+phase: 6
+execution_mode: script
+description: 生成出版级图表
+depends_on:
+  - model-results
+  - sensitivity-analyzer
+outputs:
+  - figures
+  - figure_metadata
+timeout: 300
+category: visualization

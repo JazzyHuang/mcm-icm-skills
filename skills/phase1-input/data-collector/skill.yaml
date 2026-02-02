@@ -1,0 +1,13 @@
+name: data-collector
+phase: 1
+execution_mode: hybrid
+description: 收集题目所需的外部数据，生成数据源引用
+depends_on:
+  - problem-parser
+  - problem-reference-extractor
+outputs:
+  - collected_data
+  - data_sources
+  - data_citations
+timeout: 300
+category: input

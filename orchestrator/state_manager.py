@@ -12,6 +12,37 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 
+# 章节最小字数要求（O奖标准）
+SECTION_MIN_WORDS = {
+    'introduction': 800,
+    'problem_analysis': 600,
+    'assumptions': 400,
+    'model_design': 1500,
+    'model_implementation': 1000,
+    'results_analysis': 1200,
+    'sensitivity_analysis': 800,
+    'strengths_weaknesses': 600,
+    'conclusions': 400,
+    'executive_summary': 300,
+    'memo': 500,
+}
+
+# 章节目标字数（推荐）
+SECTION_TARGET_WORDS = {
+    'introduction': 1000,
+    'problem_analysis': 800,
+    'assumptions': 500,
+    'model_design': 2000,
+    'model_implementation': 1200,
+    'results_analysis': 1500,
+    'sensitivity_analysis': 1000,
+    'strengths_weaknesses': 700,
+    'conclusions': 500,
+    'executive_summary': 400,
+    'memo': 600,
+}
+
+
 class StateManager:
     """全局状态管理器"""
     
@@ -210,12 +241,138 @@ class StateManager:
         """添加引用记录"""
         self.state['citations'].append(citation)
         
-    def set_section(self, section_name: str, content: str) -> None:
-        """设置章节内容"""
+    def set_section(self, section_name: str, content: str) -> Dict[str, Any]:
+        """
+        设置章节内容并验证长度
+        
+        Args:
+            section_name: 章节名称
+            content: 章节内容
+            
+        Returns:
+            包含验证结果的字典
+        """
+        word_count = len(content.split())
+        min_required = SECTION_MIN_WORDS.get(section_name, 300)
+        target_words = SECTION_TARGET_WORDS.get(section_name, 500)
+        
+        validation = {
+            'word_count': word_count,
+            'min_required': min_required,
+            'target_words': target_words,
+            'meets_minimum': word_count >= min_required,
+            'meets_target': word_count >= target_words,
+            'deficit': max(0, min_required - word_count),
+            'target_deficit': max(0, target_words - word_count)
+        }
+        
         self.state['sections'][section_name] = {
             'content': content,
+            'validation': validation,
             'updated_at': datetime.now().isoformat()
         }
+        
+        # 如果不满足最小要求，添加到待扩展列表
+        if not validation['meets_minimum']:
+            if 'sections_needing_expansion' not in self.state:
+                self.state['sections_needing_expansion'] = []
+            if section_name not in self.state['sections_needing_expansion']:
+                self.state['sections_needing_expansion'].append(section_name)
+                logger.warning(
+                    f"Section '{section_name}' needs expansion: "
+                    f"{word_count}/{min_required} words (deficit: {validation['deficit']})"
+                )
+        else:
+            # 如果满足要求，从待扩展列表中移除
+            if 'sections_needing_expansion' in self.state:
+                if section_name in self.state['sections_needing_expansion']:
+                    self.state['sections_needing_expansion'].remove(section_name)
+        
+        return validation
+    
+    def get_sections_needing_expansion(self) -> List[Dict[str, Any]]:
+        """
+        获取需要扩展的章节列表
+        
+        Returns:
+            需要扩展的章节信息列表
+        """
+        result = []
+        sections_to_expand = self.state.get('sections_needing_expansion', [])
+        
+        for section_name in sections_to_expand:
+            section_data = self.state['sections'].get(section_name, {})
+            validation = section_data.get('validation', {})
+            result.append({
+                'section_name': section_name,
+                'current_word_count': validation.get('word_count', 0),
+                'min_required': validation.get('min_required', 0),
+                'target_words': validation.get('target_words', 0),
+                'deficit': validation.get('deficit', 0)
+            })
+        
+        return result
+    
+    def validate_all_sections(self) -> Dict[str, Any]:
+        """
+        验证所有章节的内容长度
+        
+        Returns:
+            验证报告
+        """
+        report = {
+            'total_sections': len(self.state.get('sections', {})),
+            'sections_meeting_minimum': 0,
+            'sections_meeting_target': 0,
+            'total_word_count': 0,
+            'sections_needing_expansion': [],
+            'section_details': {}
+        }
+        
+        for section_name, section_data in self.state.get('sections', {}).items():
+            content = section_data.get('content', '')
+            word_count = len(content.split())
+            min_required = SECTION_MIN_WORDS.get(section_name, 300)
+            target_words = SECTION_TARGET_WORDS.get(section_name, 500)
+            
+            meets_minimum = word_count >= min_required
+            meets_target = word_count >= target_words
+            
+            report['total_word_count'] += word_count
+            if meets_minimum:
+                report['sections_meeting_minimum'] += 1
+            else:
+                report['sections_needing_expansion'].append(section_name)
+            if meets_target:
+                report['sections_meeting_target'] += 1
+            
+            report['section_details'][section_name] = {
+                'word_count': word_count,
+                'min_required': min_required,
+                'target_words': target_words,
+                'meets_minimum': meets_minimum,
+                'meets_target': meets_target,
+                'deficit': max(0, min_required - word_count)
+            }
+        
+        # 计算覆盖率
+        if report['total_sections'] > 0:
+            report['minimum_coverage'] = report['sections_meeting_minimum'] / report['total_sections']
+            report['target_coverage'] = report['sections_meeting_target'] / report['total_sections']
+        else:
+            report['minimum_coverage'] = 0
+            report['target_coverage'] = 0
+        
+        # 更新state中的扩展列表
+        self.state['sections_needing_expansion'] = report['sections_needing_expansion']
+        
+        return report
+    
+    def mark_section_expanded(self, section_name: str) -> None:
+        """标记章节已扩展"""
+        if section_name in self.state.get('sections', {}):
+            self.state['sections'][section_name]['expanded'] = True
+            self.state['sections'][section_name]['expanded_at'] = datetime.now().isoformat()
         
     def set_quality_score(self, dimension: str, score: float) -> None:
         """设置质量分数"""

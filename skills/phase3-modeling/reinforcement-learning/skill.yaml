@@ -1,0 +1,12 @@
+name: reinforcement-learning
+phase: 3
+execution_mode: script
+description: 强化学习方法实现
+depends_on:
+  - model-selector
+outputs:
+  - rl_model
+  - rl_results
+  - policy learned
+timeout: 300
+category: modeling

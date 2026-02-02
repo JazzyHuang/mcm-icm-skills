@@ -1,0 +1,12 @@
+name: model-validator
+phase: 4
+execution_mode: script
+description: 验证模型有效性 (交叉验证、R²等)
+depends_on:
+  - model-solver
+  - sensitivity-analyzer
+outputs:
+  - validation_metrics
+  - cross_validation_results
+timeout: 240
+category: validation

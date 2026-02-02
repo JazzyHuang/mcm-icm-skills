@@ -1,0 +1,11 @@
+name: quality-reviewer
+phase: 8
+execution_mode: llm
+description: 整体质量审查
+depends_on:
+  - latex-compiler
+outputs:
+  - quality_review
+  - overall_score
+timeout: 180
+category: quality

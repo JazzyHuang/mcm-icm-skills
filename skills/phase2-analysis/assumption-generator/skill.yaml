@@ -1,0 +1,12 @@
+name: assumption-generator
+phase: 2
+execution_mode: llm
+description: 生成合理的假设，并为每个假设提供论证
+depends_on:
+  - problem-decomposer
+outputs:
+  - assumptions
+  - assumption_justifications
+  - assumption_validity
+timeout: 120
+category: analysis

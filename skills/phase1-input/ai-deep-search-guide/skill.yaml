@@ -1,0 +1,11 @@
+name: ai-deep-search-guide
+phase: 1
+execution_mode: llm
+description: AI深度搜索引导，生成搜索策略和关键词
+depends_on:
+  - problem-parser
+outputs:
+  - search_strategy
+  - search_keywords
+timeout: 120
+category: input

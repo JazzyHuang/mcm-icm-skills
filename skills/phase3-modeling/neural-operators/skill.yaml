@@ -1,0 +1,11 @@
+name: neural-operators
+phase: 3
+execution_mode: script
+description: 神经算子 (Neural Operators) 实现
+depends_on:
+  - model-selector
+outputs:
+  - neural_operator_model
+  - operator_results
+timeout: 300
+category: modeling

@@ -1,0 +1,11 @@
+name: problem-type-classifier
+phase: 1
+execution_mode: llm
+description: 根据题目特征识别问题类型 (A-F)
+depends_on:
+  - problem-parser
+outputs:
+  - problem_type
+  - type_confidence
+timeout: 60
+category: input

@@ -1,0 +1,11 @@
+name: abstract-first-impression
+phase: 5
+execution_mode: llm
+description: 生成摘要Hook句，第一印象优化
+depends_on:
+  - section-writer
+outputs:
+  - hook_sentences
+  - hook_quality_score
+timeout: 120
+category: writing

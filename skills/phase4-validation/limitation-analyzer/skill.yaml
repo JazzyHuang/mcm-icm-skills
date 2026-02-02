@@ -1,0 +1,11 @@
+name: limitation-analyzer
+phase: 4
+execution_mode: llm
+description: 识别模型局限性，生成诚实的自我批评
+depends_on:
+  - model-validator
+outputs:
+  - limitations
+  - improvement_suggestions
+timeout: 120
+category: validation

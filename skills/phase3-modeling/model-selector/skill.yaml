@@ -1,0 +1,14 @@
+name: model-selector
+phase: 3
+execution_mode: llm
+description: |
+  根据问题类型和特征，选择最适合的数学模型。与备选方法对比，说明选择依据。
+depends_on:
+  - problem-decomposer
+  - variable-definer
+outputs:
+  - selected_model
+  - model_justification
+  - alternative_models
+timeout: 180
+category: modeling

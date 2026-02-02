@@ -1,0 +1,12 @@
+name: latex-compiler
+phase: 7
+execution_mode: script
+description: 编译LaTeX文档生成PDF
+depends_on:
+  - sections
+  - figures
+outputs:
+  - compiled_pdf
+  - compilation_log
+timeout: 120
+category: integration

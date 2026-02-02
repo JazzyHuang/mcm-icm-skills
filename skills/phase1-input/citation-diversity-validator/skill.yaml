@@ -1,0 +1,12 @@
+name: citation-diversity-validator
+phase: 1
+execution_mode: script
+description: 验证引用多样性，确保覆盖4+类别
+depends_on:
+  - citation-validator
+outputs:
+  - diversity_score
+  - category_breakdown
+  - diversity_report
+timeout: 120
+category: input

@@ -1,0 +1,11 @@
+name: consistency-checker
+phase: 8
+execution_mode: script
+description: 检查术语、数据、符号一致性
+depends_on:
+  - sections
+outputs:
+  - consistency_report
+  - consistency_score
+timeout: 120
+category: quality

@@ -1,0 +1,11 @@
+name: figure-narrative-generator
+phase: 6
+execution_mode: llm
+description: 为每个图表生成Caption和深度解释
+depends_on:
+  - chart-generator
+outputs:
+  - figure_captions
+  - figure_narratives
+timeout: 180
+category: visualization

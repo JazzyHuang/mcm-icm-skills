@@ -1,0 +1,11 @@
+name: kan-networks
+phase: 3
+execution_mode: script
+description: KAN (Kolmogorov-Arnold Networks) 实现
+depends_on:
+  - model-selector
+outputs:
+  - kan_model
+  - kan_results
+timeout: 300
+category: modeling

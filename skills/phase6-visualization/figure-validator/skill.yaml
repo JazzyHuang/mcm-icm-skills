@@ -1,0 +1,10 @@
+name: figure-validator
+phase: 6
+execution_mode: script
+description: 验证图表质量和格式
+depends_on:
+  - publication-scaler
+outputs:
+  - figure_validation_report
+timeout: 60
+category: visualization

@@ -1,0 +1,11 @@
+name: strengths-weaknesses
+phase: 4
+execution_mode: llm
+description: 分析模型优缺点
+depends_on:
+  - model-validator
+  - limitation-analyzer
+outputs:
+  - strengths_weaknesses_report
+timeout: 120
+category: validation

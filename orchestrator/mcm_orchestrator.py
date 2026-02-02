@@ -1,12 +1,13 @@
 """
 MCM/ICM 主编排器
 基于AgentOrchestra架构的层级式多智能体编排器
-增强版: 包含质量门禁和阶段回退逻辑
+增强版: 包含质量门禁和阶段回退逻辑，支持真正的技能执行
 """
 
 import asyncio
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -17,24 +18,47 @@ from .error_recovery import ErrorRecoveryManager, RecoverableError, CriticalErro
 from .state_manager import StateManager
 from .checkpoint_manager import CheckpointManager
 
+# 新导入: 技能系统组件
+from .base_skill import SkillResult
+from .llm_adapter import LLMAdapter, create_llm_adapter
+from .skill_registry import SkillRegistry, create_skill_registry
+from .skill_executor import SkillExecutor, create_skill_executor
+from .dependency_resolver import DependencyResolver, create_dependency_resolver
+from .gate_executor import QualityGateExecutor, create_gate_executor, GateResult
+from .planning_agent import PlanningAgent, create_planning_agent
+
 logger = logging.getLogger(__name__)
 
 
-# 阶段技能映射 (增强版)
+# 阶段技能映射 (增强版 v2 - 包含高级算法和深度搜索)
 PHASE_SKILLS = {
     1: ['problem-parser', 'problem-type-classifier', 'problem-reference-extractor',
-        'data-collector', 'deep-reference-searcher', 'literature-searcher', 
+        'data-collector', 'deep-reference-searcher', 'literature-searcher',
+        'ai-deep-search-guide',  # 新增: 确保深度搜索和引用多样性
         'citation-validator', 'citation-diversity-validator'],
     2: ['problem-decomposer', 'sub-problem-analyzer', 'assumption-generator',
         'variable-definer', 'constraint-identifier'],
-    3: ['model-selector', 'model-justification-generator', 'hybrid-model-designer', 
-        'model-builder', 'model-solver', 'code-verifier'],
+    3: [
+        # 基础建模流程
+        'model-selector', 'model-justification-generator', 'hybrid-model-designer',
+        'model-builder', 'model-solver', 'code-verifier',
+        # 高级算法 (新增: 前沿创新方法)
+        'physics-informed-nn',      # PINN物理信息神经网络
+        'neural-operators',         # FNO/DeepONet神经算子
+        'transformer-forecasting',  # Transformer时间序列预测
+        'reinforcement-learning',   # 强化学习
+        'kan-networks',             # KAN网络 (2025 ICLR前沿方法)
+        'causal-inference'          # 因果推断
+    ],
     4: ['sensitivity-analyzer', 'uncertainty-quantifier', 'model-validator',
-        'error-analyzer', 'limitation-analyzer', 'strengths-weaknesses', 'ethical-analyzer'],
-    5: ['section-writer', 'fact-checker', 'abstract-first-impression',
+        'error-analyzer', 'limitation-analyzer', 'strengths-weaknesses', 
+        'ethical-analyzer', 'model-explainer'],
+    5: ['section-writer', 'section-iterative-optimizer',  # 新增: 章节迭代优化
+        'fact-checker', 'abstract-first-impression',
         'abstract-generator', 'abstract-iterative-optimizer', 'memo-letter-writer'],
-    6: ['chart-generator', 'figure-narrative-generator', 'publication-scaler', 
-        'table-formatter', 'figure-validator'],
+    6: ['chart-generator', 'figure-narrative-generator', 'publication-scaler',
+        'table-formatter', 'figure-validator', 
+        'infographic-generator'],  # 新增: 信息图生成器
     7: ['latex-compiler', 'compilation-error-handler', 'citation-manager',
         'format-checker', 'anonymization-checker'],
     8: ['quality-reviewer', 'hallucination-detector', 'grammar-checker',
@@ -260,21 +284,27 @@ class MCMOrchestrator:
     """
     层级式多智能体编排器
     基于AgentOrchestra架构设计
-    增强版: 包含质量门禁和阶段回退逻辑、并发安全、依赖注入
+    增强版: 包含质量门禁和阶段回退逻辑、并发安全、依赖注入、真正的技能执行
     """
-    
+
     def __init__(
-        self, 
+        self,
         config_path: Optional[str] = None,
         state_manager: Optional[StateManager] = None,
         error_handler: Optional[ErrorRecoveryManager] = None,
         checkpoint_manager: Optional[CheckpointManager] = None,
         quality_checker: Optional[QualityGateChecker] = None,
-        config: Optional[Dict] = None
+        config: Optional[Dict] = None,
+        # 新增参数
+        llm_adapter: Optional[LLMAdapter] = None,
+        skill_registry: Optional[SkillRegistry] = None,
+        skill_executor: Optional[SkillExecutor] = None,
+        dependency_resolver: Optional[DependencyResolver] = None,
+        gate_executor: Optional[QualityGateExecutor] = None
     ):
         """
         初始化编排器（支持依赖注入）
-        
+
         Args:
             config_path: 配置文件路径，默认使用 config/settings.yaml
             state_manager: 状态管理器实例（可选，用于依赖注入）
@@ -282,10 +312,18 @@ class MCMOrchestrator:
             checkpoint_manager: 检查点管理器实例（可选，用于依赖注入）
             quality_checker: 质量检查器实例（可选，用于依赖注入）
             config: 配置字典（可选，优先于config_path）
+            llm_adapter: LLM适配器（可选，用于依赖注入）
+            skill_registry: 技能注册表（可选，用于依赖注入）
+            skill_executor: 技能执行器（可选，用于依赖注入）
+            dependency_resolver: 依赖解析器（可选，用于依赖注入）
+            gate_executor: 门禁执行器（可选，用于依赖注入）
         """
         # 配置加载（支持直接传入配置字典）
         self.config = config if config is not None else self._load_config(config_path)
-        
+
+        # 确定根目录
+        self.root_dir = Path(__file__).parent.parent
+
         # 依赖注入：如果未提供则创建默认实例
         self.state_manager = state_manager or StateManager()
         self.error_handler = error_handler or ErrorRecoveryManager(self.config)
@@ -293,6 +331,47 @@ class MCMOrchestrator:
             checkpoint_dir=Path(self.config.get('output', {}).get('checkpoint_dir', 'output/checkpoints'))
         )
         self.quality_checker = quality_checker or QualityGateChecker()
+
+        # === 新增: 初始化技能系统组件 ===
+        # LLM适配器
+        if llm_adapter is None:
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            model = self.config.get('llm', {}).get('model', 'smart')
+            mock_mode = self.config.get('llm', {}).get('mock', False)
+            self.llm_adapter = create_llm_adapter(api_key=api_key, model=model, mock=mock_mode)
+        else:
+            self.llm_adapter = llm_adapter
+
+        # 技能注册表
+        if skill_registry is None:
+            skills_dir = self.root_dir / 'skills'
+            self.skill_registry = create_skill_registry(skills_dir, self.llm_adapter)
+        else:
+            self.skill_registry = skill_registry
+
+        # 技能执行器
+        if skill_executor is None:
+            default_timeout = self.config.get('execution', {}).get('timeout_per_skill', 300)
+            self.skill_executor = create_skill_executor(self.skill_registry, default_timeout=default_timeout)
+        else:
+            self.skill_executor = skill_executor
+
+        # 依赖解析器
+        if dependency_resolver is None:
+            self.dependency_resolver = create_dependency_resolver(self.skill_registry)
+        else:
+            self.dependency_resolver = dependency_resolver
+
+        # 门禁执行器
+        if gate_executor is None:
+            gate_config = self._load_gate_config()
+            self.gate_executor = create_gate_executor(self.llm_adapter)
+            self.gate_executor.load_config(gate_config)
+        else:
+            self.gate_executor = gate_executor
+
+        # 规划Agent（新增）
+        self.planning_agent = create_planning_agent(self.llm_adapter)
         
         # 执行状态
         self.current_phase = 0
@@ -300,18 +379,35 @@ class MCMOrchestrator:
         self.fallback_count: Dict[int, int] = {}  # 记录每个阶段的回退次数
         self._state_lock = asyncio.Lock()  # 状态更新锁，防止并发竞态
         self._execution_id: Optional[str] = None  # 当前执行ID
+        self.modeling_plan: Optional[Dict] = None  # 建模计划
         
+        # 启动时验证skill注册
+        self._validate_skill_registration()
+
+        logger.info(f"MCMOrchestrator initialized with {len(self.skill_registry)} skills")
+
     def _load_config(self, config_path: Optional[str] = None) -> Dict:
         """加载配置文件"""
         if config_path is None:
             config_path = Path(__file__).parent.parent / 'config' / 'settings.yaml'
-        
+
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
                 return yaml.safe_load(f)
         except FileNotFoundError:
             logger.warning(f"Config file not found: {config_path}, using defaults")
             return self._get_default_config()
+
+    def _load_gate_config(self) -> Dict:
+        """加载质量门禁配置"""
+        gate_config_path = Path(__file__).parent.parent / 'config' / 'quality_gates.yaml'
+
+        try:
+            with open(gate_config_path, 'r', encoding='utf-8') as f:
+                return yaml.safe_load(f)
+        except FileNotFoundError:
+            logger.warning(f"Gate config not found: {gate_config_path}")
+            return {}
             
     def _get_default_config(self) -> Dict:
         """返回默认配置"""
@@ -342,6 +438,124 @@ class MCMOrchestrator:
                 'quality_reports_dir': 'output/quality_reports',
             }
         }
+
+    # ============ 启动验证和增强日志（新增） ============
+    
+    def _validate_skill_registration(self):
+        """
+        验证所有预期skills是否已注册
+        
+        在启动时检查PHASE_SKILLS中定义的所有技能是否都已在registry中注册。
+        记录缺失的技能，但不阻止启动（允许部分功能运行）。
+        """
+        missing = {}
+        total_expected = 0
+        total_registered = 0
+        
+        for phase, skills in PHASE_SKILLS.items():
+            missing_in_phase = []
+            for skill in skills:
+                total_expected += 1
+                if self.skill_registry.has_skill(skill):
+                    total_registered += 1
+                else:
+                    missing_in_phase.append(skill)
+            
+            if missing_in_phase:
+                missing[phase] = missing_in_phase
+                logger.warning(f"Phase {phase} missing skills: {missing_in_phase}")
+        
+        # 记录验证结果
+        self._skill_validation_result = {
+            'total_expected': total_expected,
+            'total_registered': total_registered,
+            'missing_by_phase': missing,
+            'registration_rate': total_registered / total_expected if total_expected > 0 else 0
+        }
+        
+        if missing:
+            logger.warning(
+                f"Skill registration validation: {total_registered}/{total_expected} skills registered "
+                f"({self._skill_validation_result['registration_rate']:.1%})"
+            )
+            logger.warning(f"Missing skills summary: {missing}")
+        else:
+            logger.info(f"All {total_expected} expected skills are registered")
+    
+    def _log_phase_execution_details(
+        self, 
+        phase: int, 
+        phase_results: Dict, 
+        phase_duration: float,
+        gate_results: Optional[Dict] = None
+    ) -> Dict:
+        """
+        记录阶段执行的详细日志
+        
+        Args:
+            phase: 阶段编号
+            phase_results: 阶段执行结果
+            phase_duration: 执行耗时（秒）
+            gate_results: 门禁检查结果
+            
+        Returns:
+            详细的执行日志记录
+        """
+        expected_skills = PHASE_SKILLS.get(phase, [])
+        registered_skills = self.skill_registry.get_phase_skills(phase)
+        executed_skills = list(phase_results.keys())
+        
+        # 计算各类技能
+        successful_skills = [
+            s for s, r in phase_results.items() 
+            if isinstance(r, dict) and r.get('status') != 'failed' or not isinstance(r, dict)
+        ]
+        failed_skills = [
+            s for s, r in phase_results.items() 
+            if isinstance(r, dict) and r.get('status') == 'failed'
+        ]
+        skipped_skills = [s for s in expected_skills if s not in executed_skills]
+        
+        log_entry = {
+            'phase': phase,
+            'timestamp': datetime.now().isoformat(),
+            'duration_seconds': round(phase_duration, 2),
+            'skills': {
+                'expected': expected_skills,
+                'expected_count': len(expected_skills),
+                'registered': registered_skills,
+                'registered_count': len(registered_skills),
+                'executed': executed_skills,
+                'executed_count': len(executed_skills),
+                'successful': successful_skills,
+                'successful_count': len(successful_skills),
+                'failed': failed_skills,
+                'failed_count': len(failed_skills),
+                'skipped': skipped_skills,
+                'skipped_count': len(skipped_skills),
+            },
+            'execution_rate': len(executed_skills) / len(expected_skills) if expected_skills else 1.0,
+            'success_rate': len(successful_skills) / len(executed_skills) if executed_skills else 0,
+            'gate_results': gate_results,
+            'status': 'success' if not failed_skills and (not gate_results or gate_results.get('passed', True)) else 'partial_failure'
+        }
+        
+        # 记录详细日志
+        logger.info(
+            f"Phase {phase} execution summary: "
+            f"{len(executed_skills)}/{len(expected_skills)} executed, "
+            f"{len(successful_skills)} successful, "
+            f"{len(failed_skills)} failed, "
+            f"{len(skipped_skills)} skipped"
+        )
+        
+        if failed_skills:
+            logger.warning(f"Phase {phase} failed skills: {failed_skills}")
+        
+        if skipped_skills:
+            logger.info(f"Phase {phase} skipped skills: {skipped_skills}")
+        
+        return log_entry
         
     async def execute_pipeline(
         self, 
@@ -385,6 +599,32 @@ class MCMOrchestrator:
                 # 更新状态
                 state.update(phase_results)
                 
+                # Phase 2完成后，执行规划Agent创建建模计划
+                if phase == 2:
+                    logger.info("Planning Agent: Creating modeling plan before Phase 3...")
+                    problem_analysis = {
+                        'sub_problems': state.get('sub_problems', []),
+                        'assumptions': state.get('assumptions', []),
+                        'variables': state.get('variables', {}),
+                        'constraints': state.get('constraints', [])
+                    }
+                    self.modeling_plan = await self.planning_agent.create_modeling_plan(
+                        problem_analysis, state
+                    )
+                    state['modeling_plan'] = self.modeling_plan
+                    logger.info(f"Planning Agent: Plan created with skills: {self.modeling_plan.get('skills_to_execute', [])}")
+                
+                # Phase 5完成后，执行章节内容验证和自动扩展
+                if phase == 5:
+                    validation_report = self.state_manager.validate_all_sections()
+                    logger.info(f"Section validation: {validation_report['sections_meeting_minimum']}/"
+                                f"{validation_report['total_sections']} sections meet minimum, "
+                                f"total {validation_report['total_word_count']} words")
+                    
+                    if validation_report['sections_needing_expansion']:
+                        logger.info("Starting auto-expansion for short sections...")
+                        state = await self._expand_short_sections(state)
+                
                 # 质量门禁检查
                 if self.config.get('execution', {}).get('quality_gates_enabled', True):
                     gates_passed, gate_results = await self.quality_checker.check_phase_gates(
@@ -404,12 +644,13 @@ class MCMOrchestrator:
                     else:
                         # 无法回退，记录失败并继续（或暂停）
                         logger.error(f"Phase {phase} failed and cannot fallback")
-                        self.execution_log.append({
-                            'phase': phase,
-                            'duration_seconds': phase_duration,
-                            'status': 'failed',
-                            'gate_results': gate_results
-                        })
+                        # 使用增强的日志记录
+                        log_entry = self._log_phase_execution_details(
+                            phase, phase_results, phase_duration, gate_results
+                        )
+                        log_entry['status'] = 'failed'
+                        self.execution_log.append(log_entry)
+                        
                         # 根据配置决定是继续还是停止
                         if self.config.get('execution', {}).get('stop_on_gate_failure', False):
                             return self._create_failure_response(phase, gate_results, state)
@@ -423,13 +664,12 @@ class MCMOrchestrator:
                 # 保存检查点
                 self.checkpoint_manager.save(state, f'phase{phase}')
                 
-                # 记录执行日志
-                self.execution_log.append({
-                    'phase': phase,
-                    'duration_seconds': phase_duration,
-                    'skills_executed': list(phase_results.keys()),
-                    'status': 'success'
-                })
+                # 使用增强的日志记录
+                log_entry = self._log_phase_execution_details(
+                    phase, phase_results, phase_duration, 
+                    gate_results if 'gate_results' in dir() else None
+                )
+                self.execution_log.append(log_entry)
                 
                 logger.info(f"Phase {phase} completed in {phase_duration:.2f}s")
                 phase += 1
@@ -543,61 +783,316 @@ class MCMOrchestrator:
             json.dump(report, f, indent=2, default=str)
         
         logger.info(f"Quality report saved to {report_path}")
-            
-    async def _execute_phase(self, phase: int, state: Dict) -> Dict:
+
+    # ============ 动态高级算法选择（新增） ============
+    
+    # 高级算法映射：从model-selector推荐到对应skill
+    ADVANCED_ALGORITHM_MAP = {
+        'pinn': 'physics-informed-nn',
+        'physics-informed neural network': 'physics-informed-nn',
+        'neural operator': 'neural-operators',
+        'fno': 'neural-operators',
+        'deeponet': 'neural-operators',
+        'transformer': 'transformer-forecasting',
+        'tft': 'transformer-forecasting',
+        'temporal fusion': 'transformer-forecasting',
+        'reinforcement learning': 'reinforcement-learning',
+        'rl': 'reinforcement-learning',
+        'dqn': 'reinforcement-learning',
+        'ppo': 'reinforcement-learning',
+        'kan': 'kan-networks',
+        'kolmogorov-arnold': 'kan-networks',
+        'causal': 'causal-inference',
+        'causal inference': 'causal-inference',
+        'dml': 'causal-inference',
+        'double machine learning': 'causal-inference',
+    }
+    
+    async def _select_advanced_algorithms(self, state: Dict) -> List[str]:
         """
-        执行单个阶段
+        根据model-selector的推荐和规划Agent的计划动态选择高级算法skills
         
         Args:
-            phase: 阶段编号 (1-10)
+            state: 当前状态（包含model-selector的输出和modeling_plan）
+            
+        Returns:
+            要执行的高级算法skill列表
+        """
+        selected_skills = []
+        
+        # 优先使用规划Agent的推荐
+        modeling_plan = state.get('modeling_plan', {})
+        plan_skills = modeling_plan.get('skills_to_execute', [])
+        
+        if plan_skills:
+            for skill in plan_skills:
+                if self.skill_registry.has_skill(skill) and skill not in selected_skills:
+                    selected_skills.append(skill)
+                    logger.info(f"Dynamic skill selection: adding '{skill}' from Planning Agent")
+        
+        # 获取model-selector的推荐
+        model_selector_result = state.get('model-selector', {})
+        recommendations = model_selector_result.get('recommendations', [])
+        skills_to_trigger = model_selector_result.get('skills_to_trigger', [])
+        
+        # 直接使用model-selector推荐的skills
+        if skills_to_trigger:
+            for skill in skills_to_trigger:
+                if skill in PHASE_SKILLS.get(3, []) and skill not in selected_skills:
+                    selected_skills.append(skill)
+                    logger.info(f"Dynamic skill selection: adding '{skill}' from model-selector recommendation")
+        
+        # 从recommendations中提取
+        for rec in recommendations[:3]:  # 最多选择前3个推荐
+            model_type = rec.get('model_type', '').lower()
+            category = rec.get('category', '')
+            
+            # 只关注innovative类型的推荐
+            if category != 'innovative' and len(selected_skills) >= 2:
+                continue
+            
+            # 匹配到对应的skill
+            for keyword, skill_name in self.ADVANCED_ALGORITHM_MAP.items():
+                if keyword in model_type and skill_name not in selected_skills:
+                    # 验证skill是否已注册
+                    if self.skill_registry.has_skill(skill_name):
+                        selected_skills.append(skill_name)
+                        logger.info(f"Dynamic skill selection: adding '{skill_name}' based on recommendation '{model_type}'")
+                        break
+        
+        # 根据问题类型添加默认高级算法
+        problem_type = state.get('problem_type', state.get('problem-type-classifier', {}).get('problem_type', 'C'))
+        
+        if not selected_skills:
+            # 根据问题类型选择默认的高级算法
+            default_algorithms = {
+                'A': ['physics-informed-nn', 'kan-networks'],
+                'B': ['reinforcement-learning'],
+                'C': ['transformer-forecasting', 'causal-inference'],
+                'D': ['reinforcement-learning'],
+                'E': ['causal-inference'],
+                'F': ['causal-inference', 'reinforcement-learning'],
+            }
+            
+            for skill in default_algorithms.get(problem_type, []):
+                if self.skill_registry.has_skill(skill):
+                    selected_skills.append(skill)
+                    logger.info(f"Dynamic skill selection: adding default '{skill}' for problem type {problem_type}")
+        
+        logger.info(f"Selected advanced algorithms for Phase 3: {selected_skills}")
+        return selected_skills
+    
+    # ============ 章节内容自动扩展（新增） ============
+    
+    async def _expand_short_sections(self, state: Dict) -> Dict:
+        """
+        自动扩展不达标的章节内容
+        
+        Args:
             state: 当前状态
             
         Returns:
+            更新后的状态
+        """
+        # 获取需要扩展的章节
+        sections_to_expand = self.state_manager.get_sections_needing_expansion()
+        
+        if not sections_to_expand:
+            logger.info("All sections meet minimum word count requirements")
+            return state
+        
+        logger.warning(f"Found {len(sections_to_expand)} sections needing expansion: "
+                       f"{[s['section_name'] for s in sections_to_expand]}")
+        
+        for section_info in sections_to_expand:
+            section_name = section_info['section_name']
+            current_count = section_info['current_word_count']
+            min_required = section_info['min_required']
+            deficit = section_info['deficit']
+            
+            logger.info(f"Expanding section '{section_name}': "
+                        f"{current_count}/{min_required} words (need {deficit} more)")
+            
+            # 获取当前内容
+            section_data = state.get('sections', {}).get(section_name, {})
+            current_content = section_data.get('content', '')
+            
+            if not current_content:
+                logger.warning(f"Section '{section_name}' has no content to expand")
+                continue
+            
+            try:
+                # 扩展内容
+                expanded_content = await self._expand_section_content(
+                    section_name,
+                    current_content,
+                    target_additional_words=deficit + 100  # 略微超过目标
+                )
+                
+                # 更新状态
+                validation = self.state_manager.set_section(section_name, expanded_content)
+                self.state_manager.mark_section_expanded(section_name)
+                
+                logger.info(f"Section '{section_name}' expanded: "
+                            f"{current_count} -> {validation['word_count']} words")
+                
+            except Exception as e:
+                logger.error(f"Failed to expand section '{section_name}': {e}")
+        
+        return self.state_manager.get_state()
+    
+    async def _expand_section_content(
+        self, 
+        section_name: str, 
+        content: str, 
+        target_additional_words: int
+    ) -> str:
+        """
+        使用LLM扩展章节内容
+        
+        Args:
+            section_name: 章节名称
+            content: 当前内容
+            target_additional_words: 目标增加字数
+            
+        Returns:
+            扩展后的内容
+        """
+        expansion_prompt = f"""
+You are an expert MCM/ICM paper writer. The following section needs to be expanded to meet 
+the minimum word count requirement for an O-award level paper.
+
+**Section Name**: {section_name}
+**Current Word Count**: {len(content.split())}
+**Additional Words Needed**: {target_additional_words}
+
+**Current Content**:
+{content}
+
+**Expansion Requirements**:
+1. Preserve all original content and key points
+2. Add more detailed explanations and justifications
+3. Include additional quantitative analysis where appropriate
+4. Add connections to other parts of the paper
+5. Expand on the methodology details
+6. Add specific examples or case studies
+7. Ensure academic writing style throughout
+
+**Important Guidelines**:
+- Every conclusion needs a "because..." explanation
+- Add at least {target_additional_words // 100} new specific numbers
+- Use depth markers: "indicates", "demonstrates", "reveals", "suggests"
+- Avoid Chinglish expressions
+- Maintain logical flow and coherence
+
+Please output the COMPLETE expanded section content.
+"""
+        
+        # 使用LLM扩展
+        response = await self.llm_adapter.complete(
+            prompt=expansion_prompt,
+            max_tokens=8192,
+            temperature=0.7
+        )
+        
+        return response
+    
+    async def _get_phase3_skills_with_dynamic_selection(self, state: Dict) -> List[str]:
+        """
+        获取Phase 3的技能列表，包含动态选择的高级算法
+        
+        Args:
+            state: 当前状态
+            
+        Returns:
+            Phase 3要执行的完整技能列表
+        """
+        # 基础建模技能（必须执行）
+        base_skills = [
+            'model-selector',
+            'model-justification-generator',
+            'hybrid-model-designer',
+            'model-builder',
+            'model-solver',
+            'code-verifier'
+        ]
+        
+        # 动态选择的高级算法
+        advanced_skills = await self._select_advanced_algorithms(state)
+        
+        # 合并列表，确保基础技能先执行
+        all_skills = base_skills + [s for s in advanced_skills if s not in base_skills]
+        
+        return all_skills
+            
+    async def _execute_phase(self, phase: int, state: Dict) -> Dict:
+        """
+        执行单个阶段 - 支持真正的并行执行和动态技能选择
+
+        使用依赖解析器确定技能分组，组内并行，组间顺序执行
+        Phase 3特殊处理：根据model-selector结果动态选择高级算法
+
+        Args:
+            phase: 阶段编号 (1-10)
+            state: 当前状态
+
+        Returns:
             阶段执行结果
         """
-        skills = PHASE_SKILLS.get(phase, [])
+        # 使用依赖解析器获取并行组
+        parallel_groups = self.dependency_resolver.get_parallel_groups(phase)
+
+        if not parallel_groups:
+            # 没有分组，使用预定义的技能列表
+            # Phase 3特殊处理：动态选择高级算法
+            if phase == 3:
+                skills = await self._get_phase3_skills_with_dynamic_selection(state)
+                logger.info(f"Phase 3 skills (with dynamic selection): {skills}")
+            else:
+                skills = PHASE_SKILLS.get(phase, [])
+            
+            if skills:
+                parallel_groups = [[s] for s in skills]
+
         results = {}
-        
-        # 检查是否有可并行执行的技能组
-        if phase in PARALLEL_SKILLS and self.config.get('execution', {}).get('parallel_skills', True):
-            skill_groups = PARALLEL_SKILLS[phase]
-            for group in skill_groups:
-                if len(group) > 1:
-                    # 并行执行（使用线程安全的方式）
-                    group_results = await self._execute_parallel_safe(group, state)
-                    for skill, result in group_results.items():
+        enable_parallel = self.config.get('execution', {}).get('parallel_skills', True)
+
+        for group in parallel_groups:
+            if len(group) == 0:
+                continue
+
+            if len(group) == 1 or not enable_parallel:
+                # 单个技能或禁用并行 -> 顺序执行
+                for skill in group:
+                    try:
+                        result = await self._run_skill_with_retry(skill, state)
                         results[skill] = result
-                    # 并行组执行完成后更新 state，确保后续组可访问这些结果
-                    async with self._state_lock:
-                        for skill in group:
-                            state.update({skill: results[skill]})
-                else:
-                    # 单个执行
-                    for skill in group:
-                        results[skill] = await self._run_skill_with_retry(skill, state)
+                        # 更新状态，使后续技能可访问
                         async with self._state_lock:
-                            state.update({skill: results[skill]})
-        else:
-            # 顺序执行
-            for skill in skills:
-                try:
-                    result = await self._run_skill_with_retry(skill, state)
+                            state.update({skill: result})
+                    except Exception as e:
+                        # 尝试备选方案
+                        fallback = FALLBACK_SKILLS.get(skill)
+                        if fallback:
+                            logger.warning(f"Skill {skill} failed, trying fallback: {fallback}")
+                            try:
+                                results[skill] = await self._run_skill(fallback, state)
+                            except Exception as fallback_error:
+                                logger.error(f"Fallback {fallback} also failed: {fallback_error}")
+                                results[skill] = {'status': 'failed', 'error': str(e)}
+                        else:
+                            raise
+            else:
+                # 并行执行一组技能
+                group_results = await self._execute_parallel_safe(group, state)
+                for skill, result in group_results.items():
                     results[skill] = result
-                    async with self._state_lock:
-                        state.update({skill: result})
-                except Exception as e:
-                    # 尝试备选方案
-                    fallback = FALLBACK_SKILLS.get(skill)
-                    if fallback:
-                        logger.warning(f"Skill {skill} failed, trying fallback: {fallback}")
-                        try:
-                            results[skill] = await self._run_skill(fallback, state)
-                        except Exception as fallback_error:
-                            logger.error(f"Fallback {fallback} also failed: {fallback_error}")
-                            results[skill] = {'status': 'failed', 'error': str(e)}
-                    else:
-                        raise
-                        
+                # 并行组执行完成后更新 state，确保后续组可访问这些结果
+                async with self._state_lock:
+                    for skill in group:
+                        if skill in results:
+                            state.update({skill: results[skill]})
+
         return results
     
     async def _execute_parallel_safe(self, skills: List[str], state: Dict) -> Dict[str, Any]:
@@ -678,32 +1173,64 @@ class MCMOrchestrator:
                     
     async def _run_skill(self, skill: str, state: Dict) -> Any:
         """
-        执行单个技能
-        
+        执行单个技能 - 真正实现
+
+        使用技能执行器来真正执行技能，而不是返回模拟结果
+
         Args:
             skill: 技能名称
             state: 当前状态
-            
+
         Returns:
             技能执行结果
+
+        Raises:
+            RecoverableError: 技能执行失败但可恢复
+            CriticalError: 技能执行严重失败
         """
         logger.info(f"Executing skill: {skill}")
-        
-        # 这里是技能执行的占位实现
-        # 在实际使用中，这会调用对应的技能处理逻辑
-        # 技能可以是:
-        # 1. 调用LLM完成特定任务
-        # 2. 执行Python脚本
-        # 3. 调用外部API
-        
-        # 模拟技能执行
-        result = {
-            'skill': skill,
-            'status': 'completed',
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        return result
+
+        try:
+            # 使用技能执行器执行
+            result = await self.skill_executor.execute(
+                skill_name=skill,
+                state=state,
+                context={
+                    'phase': self.current_phase,
+                    'config': self.config,
+                    'execution_id': self._execution_id
+                }
+            )
+
+            # 检查执行结果
+            if not result.success:
+                errors = result.errors if result.errors else ["Unknown error"]
+                error_msg = f"Skill {skill} failed: {', '.join(errors)}"
+
+                # 根据错误类型决定是否可恢复
+                if result.metadata.get('error_type') == 'timeout':
+                    raise RecoverableError(error_msg, "SkillTimeout", {'skill': skill})
+                else:
+                    raise RecoverableError(error_msg, "SkillExecutionError", {'skill': skill})
+
+            # 返回技能数据
+            return result.data
+
+        except ValueError as e:
+            # 技能不存在
+            if "not found" in str(e):
+                logger.error(f"Skill not found: {skill}")
+                raise CriticalError(f"Skill '{skill}' not registered in the system")
+            raise
+
+        except RecoverableError:
+            # 重新抛出可恢复错误
+            raise
+
+        except Exception as e:
+            # 捕获其他异常并包装
+            logger.exception(f"Unexpected error executing skill {skill}")
+            raise RecoverableError(f"Skill {skill} failed: {str(e)}", "UnexpectedError", {'skill': skill})
         
     def get_status(self) -> Dict:
         """获取当前执行状态"""
@@ -712,7 +1239,15 @@ class MCMOrchestrator:
             'execution_log': self.execution_log,
             'fallback_count': self.fallback_count,
             'quality_results': self.quality_checker.check_results,
-            'config': self.config
+            'config': self.config,
+            # 新增: 技能系统状态
+            'skills': {
+                'total': len(self.skill_registry),
+                'registered': self.skill_registry.get_skill_count(),
+                'by_phase': self.skill_registry.list_skills_by_phase()
+            },
+            'skill_executor_stats': self.skill_executor.get_stats() if hasattr(self.skill_executor, 'get_stats') else {},
+            'dependency_resolver_stats': self.dependency_resolver.get_statistics() if hasattr(self.dependency_resolver, 'get_statistics') else {},
         }
 
 

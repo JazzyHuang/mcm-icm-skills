@@ -1,0 +1,11 @@
+name: citation-manager
+phase: 7
+execution_mode: script
+description: 管理引用，生成 bibliography
+depends_on:
+  - validated_citations
+outputs:
+  - bibliography
+  - citation_commands
+timeout: 120
+category: integration

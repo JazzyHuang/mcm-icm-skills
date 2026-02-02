@@ -1,0 +1,11 @@
+name: compilation-error-handler
+phase: 7
+execution_mode: script
+description: 处理LaTeX编译错误
+depends_on:
+  - latex-compiler
+outputs:
+  - error_fixes
+  - compilation_success
+timeout: 180
+category: integration

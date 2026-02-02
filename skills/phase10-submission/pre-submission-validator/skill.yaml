@@ -1,0 +1,11 @@
+name: pre-submission-validator
+phase: 10
+execution_mode: script
+description: 提交前最终验证
+depends_on:
+  - submission-preparer
+outputs:
+  - validation_results
+  - ready_to_submit
+timeout: 120
+category: submission

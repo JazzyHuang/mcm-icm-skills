@@ -1,0 +1,13 @@
+name: chinglish-detector
+phase: 8
+execution_mode: script
+description: |
+  检测中式中式英语表达，提供修改建议
+depends_on:
+  - section-writer
+outputs:
+  - chinglish_report
+  - chinglish_score
+  - corrections_needed
+timeout: 120
+category: quality

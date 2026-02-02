@@ -1,0 +1,11 @@
+name: literature-searcher
+phase: 1
+execution_mode: api
+description: 基础文献检索，搜索相关学术文献
+depends_on:
+  - ai-deep-search-guide
+outputs:
+  - literature_references
+  - search_results
+timeout: 180
+category: input

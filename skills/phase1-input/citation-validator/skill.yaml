@@ -1,0 +1,13 @@
+name: citation-validator
+phase: 1
+execution_mode: script
+description: 验证引用的真实性和有效性 (DOI验证)
+depends_on:
+  - deep-reference-searcher
+  - literature-searcher
+outputs:
+  - validated_citations
+  - invalid_citations
+  - validation_report
+timeout: 180
+category: input

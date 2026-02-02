@@ -1,0 +1,11 @@
+name: uncertainty-quantifier
+phase: 4
+execution_mode: script
+description: 量化模型不确定性
+depends_on:
+  - model-solver
+outputs:
+  - uncertainty_bounds
+  - confidence_intervals
+timeout: 180
+category: validation

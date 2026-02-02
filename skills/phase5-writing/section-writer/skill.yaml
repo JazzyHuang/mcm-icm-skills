@@ -1,0 +1,13 @@
+name: section-writer
+phase: 5
+execution_mode: llm
+description: |
+  撰写论文各章节内容，确保学术英语规范和逻辑连贯性
+depends_on:
+  - model-builder
+  - sensitivity-analyzer
+outputs:
+  - sections
+  - section_contents
+timeout: 300
+category: writing

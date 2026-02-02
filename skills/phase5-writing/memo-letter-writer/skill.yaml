@@ -1,0 +1,10 @@
+name: memo-letter-writer
+phase: 5
+execution_mode: llm
+description: 撰写给裁判的备忘录/信件
+depends_on:
+  - abstract-iterative-optimizer
+outputs:
+  - memo_letter
+timeout: 180
+category: writing

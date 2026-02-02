@@ -1,0 +1,13 @@
+name: variable-definer
+phase: 2
+execution_mode: llm
+description: 定义所有变量和参数，创建符号表
+depends_on:
+  - problem-decomposer
+  - assumption-generator
+outputs:
+  - variables
+  - variable_definitions
+  - notation_table
+timeout: 120
+category: analysis

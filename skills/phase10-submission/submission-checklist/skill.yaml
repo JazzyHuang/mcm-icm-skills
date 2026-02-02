@@ -1,0 +1,11 @@
+name: submission-checklist
+phase: 10
+execution_mode: script
+description: 生成提交检查清单
+depends_on:
+  - pre-submission-validator
+outputs:
+  - checklist
+  - checklist_completion
+timeout: 60
+category: submission

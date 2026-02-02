@@ -1,0 +1,12 @@
+name: deep-reference-searcher
+phase: 1
+execution_mode: api
+description: 多源深度文献搜索 (Semantic Scholar, OpenAlex, arXiv, CrossRef)
+depends_on:
+  - problem-type-classifier
+outputs:
+  - deep_references
+  - reference_summaries
+  - doi_list
+timeout: 300
+category: input

@@ -1,0 +1,11 @@
+name: transformer-forecasting
+phase: 3
+execution_mode: script
+description: Transformer 时间序列预测
+depends_on:
+  - model-selector
+outputs:
+  - transformer_model
+  - forecast_results
+timeout: 300
+category: modeling

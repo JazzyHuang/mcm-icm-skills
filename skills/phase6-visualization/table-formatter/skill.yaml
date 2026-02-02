@@ -1,0 +1,10 @@
+name: table-formatter
+phase: 6
+execution_mode: script
+description: 格式化表格，符合学术规范
+depends_on:
+  - model-results
+outputs:
+  - formatted_tables
+timeout: 120
+category: visualization

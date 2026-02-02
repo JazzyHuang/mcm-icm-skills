@@ -1,0 +1,10 @@
+name: global-consistency-checker
+phase: 8
+execution_mode: script
+description: 跨章节全局一致性检查
+depends_on:
+  - consistency-checker
+outputs:
+  - global_consistency_report
+timeout: 120
+category: quality

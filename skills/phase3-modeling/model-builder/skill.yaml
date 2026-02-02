@@ -1,0 +1,13 @@
+name: model-builder
+phase: 3
+execution_mode: script
+description: 构建数学模型，编写求解代码
+depends_on:
+  - hybrid-model-designer
+  - variable-definer
+outputs:
+  - model_code
+  - model_parameters
+  - implementation_details
+timeout: 600
+category: modeling

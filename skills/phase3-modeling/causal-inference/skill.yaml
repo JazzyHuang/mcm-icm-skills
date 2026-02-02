@@ -1,0 +1,12 @@
+name: causal-inference
+phase: 3
+execution_mode: llm
+description: 因果推断分析，识别因果关系
+depends_on:
+  - problem-decomposer
+outputs:
+  - causal_graph
+  - causal_effects
+  - confounders
+timeout: 180
+category: modeling

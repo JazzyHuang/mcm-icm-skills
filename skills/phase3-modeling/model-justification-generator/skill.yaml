@@ -1,0 +1,12 @@
+name: model-justification-generator
+phase: 3
+execution_mode: llm
+description: 生成模型选择论证，与至少2种备选方法对比
+depends_on:
+  - model-selector
+outputs:
+  - model_justification
+  - alternative_comparison
+  - selection_criteria
+timeout: 180
+category: modeling

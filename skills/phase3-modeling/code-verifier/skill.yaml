@@ -1,0 +1,12 @@
+name: code-verifier
+phase: 3
+execution_mode: script
+description: 验证代码正确性，进行单元测试
+depends_on:
+  - model-solver
+outputs:
+  - verification_report
+  - test_results
+  - code_quality_metrics
+timeout: 180
+category: modeling

@@ -1,0 +1,11 @@
+name: problem-reference-extractor
+phase: 1
+execution_mode: llm
+description: 从题目中提取引用的文献和资料
+depends_on:
+  - problem-parser
+outputs:
+  - problem_references
+  - cited_papers
+timeout: 60
+category: input

@@ -1,0 +1,10 @@
+name: infographic-generator
+phase: 6
+execution_mode: script
+description: 生成信息图
+depends_on:
+  - chart-generator
+outputs:
+  - infographics
+timeout: 240
+category: visualization

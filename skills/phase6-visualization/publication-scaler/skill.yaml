@@ -1,0 +1,10 @@
+name: publication-scaler
+phase: 6
+execution_mode: script
+description: 缩放图表至出版级质量 (300 DPI)
+depends_on:
+  - chart-generator
+outputs:
+  - publication_figures
+timeout: 60
+category: visualization

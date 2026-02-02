@@ -1,0 +1,13 @@
+name: section-iterative-optimizer
+phase: 5
+execution_mode: llm
+description: 对论文各章节内容进行多轮迭代优化，基于O奖标准和Self-Refine模式持续改进直到达标
+depends_on:
+  - section-writer
+outputs:
+  - optimized_sections
+  - optimization_history
+  - section_scores
+  - final_quality_metrics
+timeout: 900
+category: writing

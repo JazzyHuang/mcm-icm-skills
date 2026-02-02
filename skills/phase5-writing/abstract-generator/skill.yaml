@@ -1,0 +1,15 @@
+name: abstract-generator
+phase: 5
+execution_mode: llm
+description: |
+  生成O奖级别的论文摘要。遵循300-500词标准，包含背景、问题、方法、结果、结论，
+  并通过12轮以上迭代优化达到最佳质量。
+depends_on:
+  - section-writer
+  - fact-checker
+outputs:
+  - abstract
+  - abstract.quality_score
+  - abstract.word_count
+timeout: 180
+category: writing

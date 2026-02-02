@@ -1,0 +1,12 @@
+name: physics-informed-nn
+phase: 3
+execution_mode: script
+description: 物理信息神经网络 (PINN) 实现
+depends_on:
+  - model-selector
+outputs:
+  - pinn_model
+  - pinn_results
+  - physics_constraints
+timeout: 300
+category: modeling

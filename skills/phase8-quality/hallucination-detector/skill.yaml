@@ -1,0 +1,12 @@
+name: hallucination-detector
+phase: 8
+execution_mode: script
+description: 检测幻觉内容，零容忍策略
+depends_on:
+  - sections
+  - citations
+outputs:
+  - hallucination_report
+  - detected_hallucinations
+timeout: 180
+category: quality

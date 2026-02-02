@@ -1,0 +1,13 @@
+name: model-solver
+phase: 3
+execution_mode: script
+description: 求解模型，获得数值结果
+depends_on:
+  - model-builder
+outputs:
+  - solution
+  - solver_output
+  - computation_time
+timeout: 600
+fallback: model-builder
+category: modeling

@@ -1,0 +1,11 @@
+name: ethical-analyzer
+phase: 4
+execution_mode: llm
+description: 伦理分析 (ICM E/F题)
+depends_on:
+  - model-validator
+outputs:
+  - ethical_assessment
+  - ethical_considerations
+timeout: 120
+category: validation

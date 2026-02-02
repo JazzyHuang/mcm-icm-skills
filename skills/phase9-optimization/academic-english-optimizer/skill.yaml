@@ -1,0 +1,11 @@
+name: academic-english-optimizer
+phase: 9
+execution_mode: llm
+description: 学术英语优化，提升专业性
+depends_on:
+  - final-polisher
+outputs:
+  - optimized_document
+  - improvement_summary
+timeout: 240
+category: optimization

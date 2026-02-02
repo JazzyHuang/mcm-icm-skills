@@ -1,0 +1,13 @@
+name: abstract-iterative-optimizer
+phase: 5
+execution_mode: llm
+description: 12轮迭代优化摘要，达到O奖标准
+depends_on:
+  - abstract-generator
+  - abstract-first-impression
+outputs:
+  - optimized_abstract
+  - optimization_history
+  - final_quality_score
+timeout: 600
+category: writing

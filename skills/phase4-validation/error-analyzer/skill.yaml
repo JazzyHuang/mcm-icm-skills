@@ -1,0 +1,11 @@
+name: error-analyzer
+phase: 4
+execution_mode: script
+description: 误差分析，多种误差指标计算
+depends_on:
+  - model-validator
+outputs:
+  - error_metrics
+  - error_visualization
+timeout: 180
+category: validation

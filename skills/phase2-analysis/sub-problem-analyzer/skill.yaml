@@ -1,0 +1,11 @@
+name: sub-problem-analyzer
+phase: 2
+execution_mode: llm
+description: 分析每个子问题的特点和求解要求
+depends_on:
+  - problem-decomposer
+outputs:
+  - sub_problem_analysis
+  - solving_requirements
+timeout: 120
+category: analysis

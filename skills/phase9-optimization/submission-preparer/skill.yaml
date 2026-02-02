@@ -1,0 +1,10 @@
+name: submission-preparer
+phase: 9
+execution_mode: script
+description: 准备提交文件，打包
+depends_on:
+  - academic-english-optimizer
+outputs:
+  - submission_package
+timeout: 60
+category: optimization

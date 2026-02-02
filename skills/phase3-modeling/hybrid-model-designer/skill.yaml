@@ -1,0 +1,13 @@
+name: hybrid-model-designer
+phase: 3
+execution_mode: llm
+description: 设计混合模型，组合多种方法
+depends_on:
+  - model-selector
+  - model-justification-generator
+outputs:
+  - hybrid_model_design
+  - model_components
+  - integration_strategy
+timeout: 240
+category: modeling

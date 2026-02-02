@@ -1,0 +1,13 @@
+name: constraint-identifier
+phase: 2
+execution_mode: llm
+description: 识别问题的约束条件和边界
+depends_on:
+  - problem-decomposer
+  - variable-definer
+outputs:
+  - constraints
+  - constraint_types
+  - feasible_region
+timeout: 120
+category: analysis

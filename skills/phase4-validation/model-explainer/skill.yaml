@@ -1,0 +1,11 @@
+name: model-explainer
+phase: 4
+execution_mode: llm
+description: 解释模型的工作原理
+depends_on:
+  - model-builder
+outputs:
+  - model_explanation
+  - algorithm_description
+timeout: 180
+category: validation

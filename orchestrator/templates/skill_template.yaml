@@ -1,0 +1,43 @@
+# 技能元数据模板
+# 每个技能目录应包含此文件以定义技能的执行方式
+
+# 技能名称 (必须与目录名一致)
+name: skill-name
+
+# 所属阶段 (1-10)
+phase: 1
+
+# 执行模式
+# 可选值:
+#   - llm: 基于LLM调用 (需要 prompt.md)
+#   - script: 基于Python脚本 (需要 scripts/ 目录)
+#   - api: 基于外部API (需要 api_config.yaml)
+#   - hybrid: 混合模式 (LLM + 脚本)
+execution_mode: llm
+
+# 技能描述
+description: |
+  简要描述这个技能的功能
+
+# 依赖的其他技能 (可选)
+# 列出此技能依赖的前置技能名称
+depends_on:
+  - prerequisite-skill-1
+  - prerequisite-skill-2
+
+# 输出的状态键 (可选)
+# 此技能执行后会输出到全局状态中的键名
+outputs:
+  - output_key_1
+  - output_key_2
+
+# 超时时间 (可选, 默认300秒)
+timeout: 300
+
+# 失败时的备选技能 (可选)
+# 当此技能失败时，尝试执行的备选技能
+fallback: fallback-skill-name
+
+# 技能类别 (可选)
+# 用于组织和筛选技能
+category: general

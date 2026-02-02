@@ -1,0 +1,14 @@
+name: sensitivity-analyzer
+phase: 4
+execution_mode: script
+description: |
+  执行敏感性分析，计算Sobol指数，识别关键参数
+depends_on:
+  - model-solver
+outputs:
+  - sensitivity_results
+  - sobol_indices
+  - tornado_diagram_data
+timeout: 300
+fallback: uncertainty-quantifier
+category: validation
